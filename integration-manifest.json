@@ -1,0 +1,8 @@
+{
+    "$schema": "https://keyfactor.github.io/integration-manifest-schema.json",
+    "integration_type": "pam",
+    "name": "CyberArk PAM Provider",
+    "status": "production",
+    "link_github": false,
+    "description": "A Keyfactor PAM Provider plugin supporting credential retrieval from a CyberArk Private Ark instance using a Credential Provider."
+}
