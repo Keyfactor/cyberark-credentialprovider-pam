@@ -6,24 +6,18 @@ using System.Net.Http;
 
 namespace Keyfactor.Extensions.Pam.CyberArk
 {
-    public class CredentialProviderPAM : IPAMProvider
+    public class CentralCredentialProviderPAM : IPAMProvider
     {
-        public string Name => "CyberArk-CredentialProvider";
+        public string Name => "CyberArk-CentralCredentialProvider";
 
         public string GetPassword(Dictionary<string, string> instanceParameters, Dictionary<string, string> initializationInfo)
         {
             string appId = initializationInfo["AppId"];
-            bool useLocalSdk = Convert.ToBoolean(initializationInfo["UseSDK"]);
             string host = initializationInfo["Host"];
 
             string safe = instanceParameters["Safe"];
             string folder = instanceParameters["Folder"];
             string obj = instanceParameters["Object"];
-
-            if (useLocalSdk)
-            {
-                throw new NotImplementedException("Dynamic Local SDK usage is not yet implemented.");
-            }
 
             var http = new HttpClient();
             http.BaseAddress = new Uri($"https://{host}/");
