@@ -14,6 +14,7 @@ namespace Keyfactor.Extensions.Pam.CyberArk
         {
             string appId = initializationInfo["AppId"];
             string host = initializationInfo["Host"];
+            string site = initializationInfo["Site"];
 
             string safe = instanceParameters["Safe"];
             string folder = instanceParameters["Folder"];
@@ -22,7 +23,7 @@ namespace Keyfactor.Extensions.Pam.CyberArk
             var http = new HttpClient();
             http.BaseAddress = new Uri($"https://{host}/");
 
-            var path = $"AIMWebService/api/Accounts?AppID={appId}&Safe={safe};Folder={folder};Object={obj}";
+            var path = $"{site}/api/Accounts?AppID={appId}&Safe={safe};Folder={folder};Object={obj}";
             var response = http.GetAsync(path).Result;
             string json = ReadHttpResponse(response);
             var account = JsonConvert.DeserializeObject<AccountsResponse>(json);

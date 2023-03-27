@@ -15,6 +15,7 @@ namespace cyberark_pam_tester
             var initParams = new Dictionary<string, string>()
             {
                 { "Host", "" },
+                { "Site", "" },
                 { "AppId", "" }
             };
 
