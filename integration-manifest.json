@@ -4,5 +4,13 @@
     "name": "CyberArk PAM Provider",
     "status": "production",
     "link_github": false,
-    "description": "A Keyfactor PAM Provider plugin supporting credential retrieval from a CyberArk Private Ark instance using a Credential Provider."
+    "description": "A Keyfactor PAM Provider plugin supporting credential retrieval with a CyberArk Credential Provider. The Central Credential Provider (cloud-hosted) can be used, or the standard Credential Provider with installed SDK.",
+    "about": {
+        "pam": {
+            "providerName": "CyberArk Central Credential Provider",
+            "assemblyName": "cyberark-credentialprovider-pam",
+            "dbName": "CyberArk-CentralCredentialProvider",
+            "fullyQualifiedClassName": "Keyfactor.Extensions.Pam.CyberArk.CentralCredentialProviderPAM"
+        }
+    }
 }
