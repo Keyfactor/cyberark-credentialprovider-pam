@@ -15,7 +15,6 @@ Keyfactor supports the retrieval of credentials from 3rd party Privileged Access
 CyberArk PAM Provider is supported by Keyfactor for Keyfactor customers. If you have a support issue, please open a support ticket with your Keyfactor representative.
 
 ###### To report a problem or suggest a new feature, use the **[Issues](../../issues)** tab. If you want to contribute actual bug fixes or proposed enhancements, use the **[Pull requests](../../pulls)** tab.
-___
 
 
 
@@ -28,9 +27,13 @@ ___
 
 ### Initial Configuration of PAM Provider
 In order to allow Keyfactor to use the new CyberArk PAM Provider, the definition needs to be added to the application database.
-This is done by running the provided [add_PAMProvider.sql](./add_PAMProvider.sql) script on the Keyfactor application database, which only needs to be done one time.
+This is done by running the provided `kfutil` tool to install the PAM definition, which only needs to be done one time. It uses API credentials to access the Keyfactor instance and create the PAM definition.
 
-If you have a hosted environment or need assistance completing this step, please contact Keyfactor Support.
+The `kfutil` tool, after being [configured for API access](https://github.com/Keyfactor/kfutil#quickstart), can be run in the following manner to install the PAM definition from the Keyfactor repository:
+
+```
+kfutil pam types-create -r cyberark-credentialprovider-pam -n CyberArk-CentralCredentialProvider
+```
 
 ### Configuring Parameters
 The following are the parameter names and a description of the values needed to configure the CyberArk PAM Provider.
@@ -80,7 +83,7 @@ After registering the Credential Provider during install, make sure the Provider
 
 #### In Keyfactor - PAM Provider
 ##### Installation
-In order to setup a new PAM Provider in the Keyfactor Platform for the first time, you will need to run [the SQL Installation Script](./add_PAMProvider.sql) against your Keyfactor application database.
+In order to setup a new PAM Provider in the Keyfactor Platform for the first time, you will need to run the `kfutil` tool (see Initial Configuration of PAM Provider).
 
 After the installation is run, the DLLs need to be installed to the correct location for the PAM Provider to function. From the release, the cyberark-credentialprovider-pam.dll should be copied to the following folder locations in the Keyfactor installation. Once the DLL has been copied to these folders, edit the corresponding config file. You will need to add a new Unity entry as follows under `<container>`, next to other `<register>` tags.
 
@@ -115,6 +118,7 @@ In order to use the PAM Provider, the provider's configuration must be set in th
 After it is set up, you can now use your PAM Provider when configuring certificate stores. Any field that is treated as a Keyfactor secret, such as server passwords and certificate store passwords can be retrieved from your PAM Provider instead of being entered in directly as a secret.
 
 ![](images/password.png)
+
 
 ---
 
