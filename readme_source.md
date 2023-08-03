@@ -1,0 +1,5 @@
+#### Considerations for PAM on Universal Orchestrator
+
+There are 2 PAM interfaces provided for using CyberArk as a PAM Provider. By default, the Central Credential Provider will be used when installing on a Universal Orchestrator, as that PAM interface is what is defined by the default `manifest.json`. The Initialization Parameters can be edited as normal in this file when you are planning to use the Central Credential Provider.
+
+If instead, the SDK-based Credential Provider should be used on the Universal Orchestrator, the extension should be installed normally, with an additonal step after placing the files in the extension folder. In the CyberArk-CredentialProvider extension folder on the Keyfactor Universal Orchestrator, the `SDK-manifest.json` manifest file needs to be used instead of the standard `manifest.json`. You should delete or rename the original `manifest.json` to `Central-manifest.json` and rename the `SDK-manifest.json` to be the new `manifest.json`. At this point, you can edit the values in the manifest to properly load the SDK-based PAM Provider.
