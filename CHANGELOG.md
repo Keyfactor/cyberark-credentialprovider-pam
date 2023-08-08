@@ -1,5 +1,6 @@
 2.0.1
 - Bug fix for DLL compatibility issue preventing CyberArk from loading correctly on the Keyfactor Platform
+- Include `manifest.json` and alternate `SDK-manifest.json` files and instructions on their use
 
 2.0.0
 - Re-release of the original CyberArk PAM Provider as a separate integration
