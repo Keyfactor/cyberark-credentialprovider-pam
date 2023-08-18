@@ -25,7 +25,9 @@ CyberArk PAM Provider is supported by Keyfactor for Keyfactor customers. If you 
 
 
 
-
+#### Compatibility
+This release was tested against CyberArk version 12.6.
+Using this on a Universal Orchestrator requires UO version 10.1 or greater.
 
 ### Initial Configuration of PAM Provider
 In order to allow Keyfactor to use the new CyberArk PAM Provider, the definition needs to be added to the application database.
@@ -83,6 +85,48 @@ To use a local Credential Provider instead, the Credential Provider will need to
 
 After registering the Credential Provider during install, make sure the Provider for the machine has been granted permission to access the Safe, as well as the Application ID that will be used.
 
+#### On Keyfactor Universal Orchestrator
+<details>
+<summary>Installation - CyberArk Central Credential Provider </summary>
+<p>
+Install the CyberArk Central Credential Provider as an extension by copying the release contents into a new extension folder named `CyberArk-CentralCredentialProvider`.
+A `manifest.json` file is included in the release. This file needs to be edited to enter in the "initialization" parameters for the PAM Provider. Specifically values need to be entered for the parameters in the `manifest.json` of the __PAM Provider extension__:
+
+~~~ json
+"Keyfactor:PAMProviders:CyberArk-CentralCredentialProvider:InitializationInfo": {
+    "AppId": "myappid",
+    "Host": "https://my.cyberark.instance:99999",
+    "Site": "WithOutCert"
+  }
+~~~
+</p>
+</details>
+
+<details>
+<summary>Installation - SDK-based local Credential Provider</summary>
+<p>
+Install the CyberArk SDK-based local Credential Provider as an extension by copying the release contents into a new extension folder named `CyberArk-SdkCredentialProvider`.
+The default `manifest.json` needs to be replaced with the included `SDK-manifest.json`. Rename the existing `manifest.json` as `Central-manifest.json` and then rename the `SDK-manifest.json` to replace the original `manifest.json`.
+This file then needs to be edited to enter in the "initialization" parameters for the PAM Provider. Specifically values need to be entered for the parameters in the `manifest.json` of the __PAM Provider extension__:
+
+~~~json
+"Keyfactor:PAMProviders:CyberArk-SdkCredentialProvider:InitializationInfo": {
+    "AppId": "myappid"
+  }
+~~~
+</p>
+</details>
+
+#### Usage with the Keyfactor Universal Orchestrator
+To use the PAM Provider to resolve a field, for example a Server Password, instead of entering in the actual value for the Server Password, enter a `json` object with the parameters specifying the field.
+The parameters needed are the "instance" parameters above:
+
+~~~ json
+{"Safe":"MySafe","Folder":"Root\Secrets","Object":"MySecret"}
+~~~
+
+If a field supports PAM but should not use PAM, simply enter in the actual value to be used instead of the `json` format object above.
+
 #### In Keyfactor - PAM Provider
 ##### Installation
 In order to setup a new PAM Provider in the Keyfactor Platform for the first time, you will need to run the `kfutil` tool (see Initial Configuration of PAM Provider).
@@ -125,9 +169,5 @@ After it is set up, you can now use your PAM Provider when configuring certifica
 ---
 
 
-#### Considerations for PAM on Universal Orchestrator
 
-There are 2 PAM interfaces provided for using CyberArk as a PAM Provider. By default, the Central Credential Provider will be used when installing on a Universal Orchestrator, as that PAM interface is what is defined by the default `manifest.json`. The Initialization Parameters can be edited as normal in this file when you are planning to use the Central Credential Provider.
-
-If instead, the SDK-based Credential Provider should be used on the Universal Orchestrator, the extension should be installed normally, with an additonal step after placing the files in the extension folder. In the CyberArk-CredentialProvider extension folder on the Keyfactor Universal Orchestrator, the `SDK-manifest.json` manifest file needs to be used instead of the standard `manifest.json`. You should delete or rename the original `manifest.json` to `Central-manifest.json` and rename the `SDK-manifest.json` to be the new `manifest.json`. At this point, you can edit the values in the manifest to properly load the SDK-based PAM Provider.
 
