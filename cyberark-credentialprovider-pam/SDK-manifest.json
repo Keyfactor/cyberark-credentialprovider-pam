@@ -1,0 +1,13 @@
+{
+    "extensions": {
+      "Keyfactor.Platform.Extensions.IPAMProvider": {
+        "PAMProviders.CyberArk-SdkCredentialProvider.PAMProvider": {
+          "assemblyPath": "cyberark-credentialprovider-pam.dll",
+          "TypeFullName": "Keyfactor.Extensions.Pam.CyberArk.SdkCredentialProviderPAM"
+        }
+      }
+    },
+    "Keyfactor:PAMProviders:CyberArk-SdkCredentialProvider:InitializationInfo": {
+      "AppId": "myappid"
+    }
+  }

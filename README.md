@@ -4,9 +4,11 @@ A Keyfactor PAM Provider plugin supporting credential retrieval with a CyberArk 
 
 #### Integration status: Production - Ready for use in production environments.
 
+
 ## About the Keyfactor PAM Provider
 
 Keyfactor supports the retrieval of credentials from 3rd party Privileged Access Management (PAM) solutions. Secret values can normally be stored, encrypted at rest, in the Keyfactor Platform database. A PAM Provider can allow these secrets to be stored, managed, and rotated in an external platform. This integration is usually configured on the Keyfactor Platform itself, where the platform can request the credential values when needed. In certain scenarios, a PAM Provider can instead be run on a remote location in conjunction with a Keyfactor Orchestrator to allow credential requests to originate from a location other than the Keyfactor Platform.
+
 
 
 
@@ -123,5 +125,9 @@ After it is set up, you can now use your PAM Provider when configuring certifica
 ---
 
 
+#### Considerations for PAM on Universal Orchestrator
 
+There are 2 PAM interfaces provided for using CyberArk as a PAM Provider. By default, the Central Credential Provider will be used when installing on a Universal Orchestrator, as that PAM interface is what is defined by the default `manifest.json`. The Initialization Parameters can be edited as normal in this file when you are planning to use the Central Credential Provider.
+
+If instead, the SDK-based Credential Provider should be used on the Universal Orchestrator, the extension should be installed normally, with an additonal step after placing the files in the extension folder. In the CyberArk-CredentialProvider extension folder on the Keyfactor Universal Orchestrator, the `SDK-manifest.json` manifest file needs to be used instead of the standard `manifest.json`. You should delete or rename the original `manifest.json` to `Central-manifest.json` and rename the `SDK-manifest.json` to be the new `manifest.json`. At this point, you can edit the values in the manifest to properly load the SDK-based PAM Provider.
 
