@@ -13,3 +13,4 @@
     - Mimics the original CyberArk PAM Provider
     - Requires a Credential Provider is installed and configured on the machine using PAM
     - Requires a separate `NetStandardPasswordSDK.dll` from CyberArk to function
+
