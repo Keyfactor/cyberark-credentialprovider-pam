@@ -10,14 +10,11 @@ A Keyfactor PAM Provider plugin supporting credential retrieval with a CyberArk 
 Keyfactor supports the retrieval of credentials from 3rd party Privileged Access Management (PAM) solutions. Secret values can normally be stored, encrypted at rest, in the Keyfactor Platform database. A PAM Provider can allow these secrets to be stored, managed, and rotated in an external platform. This integration is usually configured on the Keyfactor Platform itself, where the platform can request the credential values when needed. In certain scenarios, a PAM Provider can instead be run on a remote location in conjunction with a Keyfactor Orchestrator to allow credential requests to originate from a location other than the Keyfactor Platform.
 
 
-
-
 ## Support for CyberArk PAM Provider
 
 CyberArk PAM Provider is supported by Keyfactor for Keyfactor customers. If you have a support issue, please open a support ticket with your Keyfactor representative.
 
 ###### To report a problem or suggest a new feature, use the **[Issues](../../issues)** tab. If you want to contribute actual bug fixes or proposed enhancements, use the **[Pull requests](../../pulls)** tab.
-
 
 
 ---
@@ -89,8 +86,8 @@ After registering the Credential Provider during install, make sure the Provider
 <details>
 <summary>Installation - CyberArk Central Credential Provider </summary>
 <p>
-Install the CyberArk Central Credential Provider as an extension by copying the release contents into a new extension folder named `CyberArk-CentralCredentialProvider`.
-A `manifest.json` file is included in the release. This file needs to be edited to enter in the "initialization" parameters for the PAM Provider. Specifically values need to be entered for the parameters in the `manifest.json` of the __PAM Provider extension__:
+Install the CyberArk Central Credential Provider as an extension by copying the release contents into a new extension folder named <code>CyberArk-CentralCredentialProvider</code>.
+A <code>manifest.json</code> file is included in the release. This file needs to be edited to enter in the "initialization" parameters for the PAM Provider. Specifically values need to be entered for the parameters in the <code>manifest.json</code> of the <b>PAM Provider extension</b>:
 
 ~~~ json
 "Keyfactor:PAMProviders:CyberArk-CentralCredentialProvider:InitializationInfo": {
@@ -105,9 +102,9 @@ A `manifest.json` file is included in the release. This file needs to be edited 
 <details>
 <summary>Installation - SDK-based local Credential Provider</summary>
 <p>
-Install the CyberArk SDK-based local Credential Provider as an extension by copying the release contents into a new extension folder named `CyberArk-SdkCredentialProvider`.
-The default `manifest.json` needs to be replaced with the included `SDK-manifest.json`. Rename the existing `manifest.json` as `Central-manifest.json` and then rename the `SDK-manifest.json` to replace the original `manifest.json`.
-This file then needs to be edited to enter in the "initialization" parameters for the PAM Provider. Specifically values need to be entered for the parameters in the `manifest.json` of the __PAM Provider extension__:
+Install the CyberArk SDK-based local Credential Provider as an extension by copying the release contents into a new extension folder named <code>CyberArk-SdkCredentialProvider</code>. The <code>NetStandardPasswordSDK.dll</code> assembly will still need to be copied over to the installation location as well.
+The default <code>manifest.json</code> needs to be replaced with the included <code>SDK-manifest.json</code>. Rename the existing <code>manifest.json</code> as <code>Central-manifest.json</code> and then rename the <code>SDK-manifest.json</code> to replace the original <code>manifest.json</code>.
+This file then needs to be edited to enter in the "initialization" parameters for the PAM Provider. Specifically values need to be entered for the parameters in the <code>manifest.json</code> of the <b>PAM Provider extension</b>:
 
 ~~~json
 "Keyfactor:PAMProviders:CyberArk-SdkCredentialProvider:InitializationInfo": {
