@@ -1,0 +1,15 @@
+{
+  "extensions": {
+    "Keyfactor.Platform.Extensions.IPAMProvider": {
+      "PAMProviders.CyberArk-CentralCredentialProvider.PAMProvider": {
+        "assemblyPath": "cyberark-credentialprovider-pam.dll",
+        "TypeFullName": "Keyfactor.Extensions.Pam.CyberArk.CentralCredentialProviderPAM"
+      }
+    }
+  },
+  "Keyfactor:PAMProviders:CyberArk-CentralCredentialProvider:InitializationInfo": {
+    "AppId": "myappid",
+    "Host": "https://my.cyberark.instance:99999",
+    "Site": "WithOutCert"
+  }
+}
