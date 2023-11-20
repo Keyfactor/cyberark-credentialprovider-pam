@@ -20,17 +20,17 @@ using System.Reflection;
 
 namespace Keyfactor.Extensions.Pam.CyberArk
 {
-    public class SdkCredentialProviderPAM : IPAMProvider
+    public class SdkCredentialProviderPAM : CyberArkProvider, IPAMProvider
     {
         public string Name => "CyberArk-SdkCredentialProvider";
 
         public string GetPassword(Dictionary<string, string> instanceParameters, Dictionary<string, string> initializationInfo)
         {
-            string appId = initializationInfo["AppId"];
+            string appId = GetRequiredValue(initializationInfo, "AppId");
 
-            string safe = instanceParameters["Safe"];
-            string folder = instanceParameters["Folder"];
-            string obj = instanceParameters["Object"];
+            string safe = GetRequiredValue(instanceParameters, "Safe");
+            string folder = GetRequiredValue(instanceParameters, "Folder");
+            string obj = GetRequiredValue(instanceParameters, "Object");
 
             string executingDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string dll = Path.Combine(executingDir, "NetStandardPasswordSDK.dll");
