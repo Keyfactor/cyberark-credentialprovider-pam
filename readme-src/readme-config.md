@@ -19,7 +19,7 @@ A <code>manifest.json</code> file is included in the release. This file needs to
 ~~~ json
 "Keyfactor:PAMProviders:CyberArk-CentralCredentialProvider:InitializationInfo": {
     "AppId": "myappid",
-    "Host": "https://my.cyberark.instance:99999",
+    "Host": "my.cyberark.instance:99999",
     "Site": "WithOutCert"
   }
 ~~~
