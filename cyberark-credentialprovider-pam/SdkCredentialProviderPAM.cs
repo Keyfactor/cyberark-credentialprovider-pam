@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Keyfactor.Logging;
 using Keyfactor.Platform.Extensions;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,17 +26,43 @@ namespace Keyfactor.Extensions.Pam.CyberArk
     {
         public string Name => "CyberArk-SdkCredentialProvider";
 
+        private readonly ILogger Logger;
+        private readonly string ExtensionPath;
+
+        public SdkCredentialProviderPAM()
+        {
+            Logger = LogHandler.GetClassLogger<SdkCredentialProviderPAM>();
+            Logger.LogTrace($"Starting up {Name} with no constructor parameters.");
+
+            // when lookup path is not provided, use executing assembly location (running on UO)
+            ExtensionPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            Logger.LogInformation($"{Name} determined it will use the following directory to load the SDK: {ExtensionPath}");
+        }
+
+        public SdkCredentialProviderPAM(string extensionPath)
+        {
+            Logger = LogHandler.GetClassLogger<SdkCredentialProviderPAM>();
+            Logger.LogTrace($"Starting up {Name} with constructor parameters provided.");
+
+            // Extension Path (for looking up DLL) can be passed in as a Unity Constructor parameter (running on Command)
+            ExtensionPath = extensionPath;
+            Logger.LogInformation($"{Name} determined it will use the following directory to load the SDK: {ExtensionPath}");
+        }
+
         public string GetPassword(Dictionary<string, string> instanceParameters, Dictionary<string, string> initializationInfo)
         {
             string appId = GetRequiredValue(initializationInfo, "AppId");
+            Logger.LogInformation($"Configured with Initialization Parameters: AppId = {appId}");
 
             string safe = GetRequiredValue(instanceParameters, "Safe");
             string folder = GetRequiredValue(instanceParameters, "Folder");
             string obj = GetRequiredValue(instanceParameters, "Object");
+            Logger.LogInformation($"Configured with Instance Parameters: Safe = {safe} ; Folder = {folder} ; Object = {obj}");
 
-            string executingDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string dll = Path.Combine(executingDir, "NetStandardPasswordSDK.dll");
+            string dll = Path.Combine(ExtensionPath, "NetStandardPasswordSDK.dll");
+            Logger.LogDebug($"Loading DLL: {dll}");
             var sdk = Assembly.LoadFrom(dll);
+            Logger.LogTrace("Loaded SDK DLL.");
 
             // get the types from the dll
             Type PasswordSDKType = sdk.GetType("CyberArk.AAM.NetStandardPasswordSDK.PasswordSDK");
@@ -50,7 +78,9 @@ namespace Keyfactor.Extensions.Pam.CyberArk
             }
 
             object passwordRequest;
+            Logger.LogTrace("Attempting to invoke constructor of PSDKPasswordRequest type.");
             passwordRequest = ctor.Invoke(null);
+            Logger.LogTrace($"Constructed PSDKPasswordRequest. {passwordRequest}");
 
             PropertyInfo propertyInfo = PasswordRequestType.GetProperty("ConnectionTimeout");
             propertyInfo.SetValue(passwordRequest, 30);
@@ -73,7 +103,21 @@ namespace Keyfactor.Extensions.Pam.CyberArk
 
 
             // Sending the request to get the password
-            object passwordResponse = PasswordSDKType.GetMethod("GetPassword").Invoke(null, new object[] { passwordRequest });
+            Logger.LogTrace("Attempting to invoke GetPassword method of PasswordSDK type.");
+            object passwordResponse;
+            try
+            {
+                passwordResponse = PasswordSDKType.GetMethod("GetPassword").Invoke(null, new object[] { passwordRequest });
+            }
+            catch (TargetInvocationException ex)
+            {
+                Logger.LogError(ex.InnerException, "Error occurred when invoking GetPassword method.");
+                Logger.LogError(ex.ToString());
+                Logger.LogError(ex.InnerException.ToString());
+
+                throw ex.InnerException;
+            }
+            Logger.LogTrace("Invoked GetPassword method.");
 
 
             // Analyzing the response
