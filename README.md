@@ -92,7 +92,7 @@ A <code>manifest.json</code> file is included in the release. This file needs to
 ~~~ json
 "Keyfactor:PAMProviders:CyberArk-CentralCredentialProvider:InitializationInfo": {
     "AppId": "myappid",
-    "Host": "https://my.cyberark.instance:99999",
+    "Host": "my.cyberark.instance:99999",
     "Site": "WithOutCert"
   }
 ~~~
@@ -150,7 +150,13 @@ The Keyfactor service and IIS Server should be restarted after making these chan
 For registering the CyberArk for use with the SDK-based Credential Provider, use the following `<register>` instead.
 
 ```xml
-<register type="IPAMProvider" mapTo="Keyfactor.Extensions.Pam.CyberArk.SdkCredentialProviderPAM, cyberark-credentialprovider-pam" name="CyberArk-SdkCredentialProvider" />
+<register type="IPAMProvider" mapTo="Keyfactor.Extensions.Pam.CyberArk.SdkCredentialProviderPAM, cyberark-credentialprovider-pam" name="CyberArk-SdkCredentialProvider">
+  <constructor>
+    <param name="extensionPath">
+      <value value="C:\Program Files\Keyfactor\Keyfactor Platform\WebAgentServices\bin"/>
+    </param>
+  </constructor>
+</register>
 ```
 
 ##### Usage
