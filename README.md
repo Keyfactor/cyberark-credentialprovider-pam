@@ -116,10 +116,10 @@ This file then needs to be edited to enter in the "initialization" parameters fo
 
 #### Usage with the Keyfactor Universal Orchestrator
 To use the PAM Provider to resolve a field, for example a Server Password, instead of entering in the actual value for the Server Password, enter a `json` object with the parameters specifying the field.
-The parameters needed are the "instance" parameters above:
+The parameters needed are the "instance" parameters above (with appropriate characters escaped for correct JSON formatting):
 
 ~~~ json
-{"Safe":"MySafe","Folder":"Root\Secrets","Object":"MySecret"}
+{"Safe":"MySafe","Folder":"Root\\Secrets","Object":"MySecret"}
 ~~~
 
 If a field supports PAM but should not use PAM, simply enter in the actual value to be used instead of the `json` format object above.
