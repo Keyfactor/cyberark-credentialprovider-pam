@@ -27,22 +27,36 @@ namespace Keyfactor.Extensions.Pam.CyberArk
         public string Name => "CyberArk-SdkCredentialProvider";
 
         private readonly ILogger Logger;
+        private readonly Constants.SDK SDKConstants;
         private readonly string ExtensionPath;
+        private readonly bool UsingFrameworkLibrary = false;
 
         public SdkCredentialProviderPAM()
         {
             Logger = LogHandler.GetClassLogger<SdkCredentialProviderPAM>();
             Logger.LogTrace($"Starting up {Name} with no constructor parameters.");
+            SDKConstants = new Constants.NetStandard();
+            Logger.LogTrace($"SDK to be targeted will be {SDKConstants.DLL}");
 
             // when lookup path is not provided, use executing assembly location (running on UO)
             ExtensionPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Logger.LogInformation($"{Name} determined it will use the following directory to load the SDK: {ExtensionPath}");
         }
 
-        public SdkCredentialProviderPAM(string extensionPath)
+        public SdkCredentialProviderPAM(string extensionPath, bool useFramework = true)
         {
             Logger = LogHandler.GetClassLogger<SdkCredentialProviderPAM>();
             Logger.LogTrace($"Starting up {Name} with constructor parameters provided.");
+            UsingFrameworkLibrary = useFramework;
+            if (UsingFrameworkLibrary)
+            {
+                SDKConstants = new Constants.NetFramework();
+            }
+            else
+            {
+                SDKConstants = new Constants.NetStandard();
+            }
+            Logger.LogTrace($"SDK to be targeted will be {SDKConstants.DLL}");
 
             // Extension Path (for looking up DLL) can be passed in as a Unity Constructor parameter (running on Command)
             ExtensionPath = extensionPath;
@@ -59,16 +73,16 @@ namespace Keyfactor.Extensions.Pam.CyberArk
             string obj = GetRequiredValue(instanceParameters, "Object");
             Logger.LogInformation($"Configured with Instance Parameters: Safe = {safe} ; Folder = {folder} ; Object = {obj}");
 
-            string dll = Path.Combine(ExtensionPath, "NetStandardPasswordSDK.dll");
+            string dll = Path.Combine(ExtensionPath, SDKConstants.DLL);
             Logger.LogDebug($"Loading DLL: {dll}");
             var sdk = Assembly.LoadFrom(dll);
             Logger.LogTrace("Loaded SDK DLL.");
 
             // get the types from the dll
-            Type PasswordSDKType = sdk.GetType("CyberArk.AAM.NetStandardPasswordSDK.PasswordSDK");
-            Type PasswordRequestType = sdk.GetType("CyberArk.AAM.NetStandardPasswordSDK.PSDKPasswordRequest");
-            Type PasswordSDKExceptionType = sdk.GetType("CyberArk.AAM.NetStandardPasswordSDK.Exceptions.PSDKException");
-            Type PasswordResponseType = sdk.GetType("CyberArk.AAM.NetStandardPasswordSDK.PSDKPassword");
+            Type PasswordSDKType = sdk.GetType(SDKConstants.PasswordSDKType);
+            Type PasswordRequestType = sdk.GetType(SDKConstants.PasswordRequestType);
+            Type PasswordSDKExceptionType = sdk.GetType(SDKConstants.PasswordSDKExceptionType);
+            Type PasswordResponseType = sdk.GetType(SDKConstants.PasswordResponseType);
 
             // Create Password Request
             ConstructorInfo ctor = PasswordRequestType.GetConstructor(Type.EmptyTypes);
@@ -122,9 +136,18 @@ namespace Keyfactor.Extensions.Pam.CyberArk
 
             // Analyzing the response
             propertyInfo = PasswordResponseType.GetProperty("Content");
-            var password = (char[])propertyInfo.GetValue(passwordResponse, null);
-
-            return new string(password);
+            if (UsingFrameworkLibrary)
+            {
+                // for netframework
+                var password = (string)propertyInfo.GetValue(passwordResponse, null);
+                return password;
+            }
+            else
+            {
+                //for netstandard
+                var password = (char[])propertyInfo.GetValue(passwordResponse, null);
+                return new string(password);
+            }
         }
     }
 }
