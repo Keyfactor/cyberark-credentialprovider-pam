@@ -20,19 +20,19 @@ using System.Net.Http;
 
 namespace Keyfactor.Extensions.Pam.CyberArk
 {
-    public class CentralCredentialProviderPAM : IPAMProvider
+    public class CentralCredentialProviderPAM : CyberArkProvider, IPAMProvider
     {
         public string Name => "CyberArk-CentralCredentialProvider";
 
         public string GetPassword(Dictionary<string, string> instanceParameters, Dictionary<string, string> initializationInfo)
         {
-            string appId = initializationInfo["AppId"];
-            string host = initializationInfo["Host"];
-            string site = initializationInfo["Site"];
+            string appId = GetRequiredValue(initializationInfo, "AppId");
+            string host = GetRequiredValue(initializationInfo, "Host");
+            string site = GetRequiredValue(initializationInfo, "Site");
 
-            string safe = instanceParameters["Safe"];
-            string folder = instanceParameters["Folder"];
-            string obj = instanceParameters["Object"];
+            string safe = GetRequiredValue(instanceParameters, "Safe");
+            string folder = GetRequiredValue(instanceParameters, "Folder");
+            string obj = GetRequiredValue(instanceParameters, "Object");
 
             var http = new HttpClient();
             http.BaseAddress = new Uri($"https://{host}/");
