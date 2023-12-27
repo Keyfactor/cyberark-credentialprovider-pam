@@ -12,7 +12,7 @@ Keyfactor supports the retrieval of credentials from 3rd party Privileged Access
 
 ## Support for CyberArk PAM Provider
 
-CyberArk PAM Provider is supported by Keyfactor for Keyfactor customers. If you have a support issue, please open a support ticket with your Keyfactor representative.
+CyberArk PAM Provider is supported by Keyfactor for Keyfactor customers. If you have a support issue, please open a support ticket via the Keyfactor Support Portal at https://support.keyfactor.com
 
 ###### To report a problem or suggest a new feature, use the **[Issues](../../issues)** tab. If you want to contribute actual bug fixes or proposed enhancements, use the **[Pull requests](../../pulls)** tab.
 
@@ -149,6 +149,7 @@ The Keyfactor service and IIS Server should be restarted after making these chan
 
 
 For registering the CyberArk for use with the SDK-based Credential Provider, use the following `<register>` instead.
+Make sure to enter in the correct full path to the directory for `extensionPath` that has the SDK DLL for the PAM Provider.
 
 ```xml
 <register type="IPAMProvider" mapTo="Keyfactor.Extensions.Pam.CyberArk.SdkCredentialProviderPAM, cyberark-credentialprovider-pam" name="CyberArk-SdkCredentialProvider">
