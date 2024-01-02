@@ -4,7 +4,7 @@
   "name": "CyberArk PAM Provider",
   "status": "production",
   "support_level": "kf-supported",
-  "link_github": false,
+  "link_github": true,
   "update_catalog": true,
   "release_dir": "cyberark-credentialprovider-pam/bin/Release/netstandard2.0",
   "description": "A Keyfactor PAM Provider plugin supporting credential retrieval with a CyberArk Credential Provider. The Central Credential Provider (cloud-hosted) can be used, or the standard Credential Provider with installed SDK.",
