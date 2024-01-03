@@ -79,6 +79,7 @@ Certificate Authentication cannot be required. This may necessitate creating a S
 
 #### For SDK-based local Credential Provider
 To use a local Credential Provider instead, the Credential Provider will need to be installed on the machine that is using the PAM Provider. After installing the Credential Provider, copy the `NetStandardPasswordSDK.dll` assembly from the install location into the PAM Provider install location. This dll __needs__ to be adjacent to `cyberark-credentialprovider-pam.dll` to be properly loaded.
+__Important__: When running the SDK Credential Provider on Keyfactor Command, the `NetPasswordSDK.dll` needs to be copied instead of `NetStandardPasswordSDK.dll`. This library is compatible with .NET Framework which is necessary to work in Keyfactor Command.
 
 After registering the Credential Provider during install, make sure the Provider for the machine has been granted permission to access the Safe, as well as the Application ID that will be used.
 
@@ -92,7 +93,7 @@ A <code>manifest.json</code> file is included in the release. This file needs to
 ~~~ json
 "Keyfactor:PAMProviders:CyberArk-CentralCredentialProvider:InitializationInfo": {
     "AppId": "myappid",
-    "Host": "https://my.cyberark.instance:99999",
+    "Host": "my.cyberark.instance:99999",
     "Site": "WithOutCert"
   }
 ~~~
@@ -116,10 +117,10 @@ This file then needs to be edited to enter in the "initialization" parameters fo
 
 #### Usage with the Keyfactor Universal Orchestrator
 To use the PAM Provider to resolve a field, for example a Server Password, instead of entering in the actual value for the Server Password, enter a `json` object with the parameters specifying the field.
-The parameters needed are the "instance" parameters above:
+The parameters needed are the "instance" parameters above (with appropriate characters escaped for correct JSON formatting):
 
 ~~~ json
-{"Safe":"MySafe","Folder":"Root\Secrets","Object":"MySecret"}
+{"Safe":"MySafe","Folder":"Root\\Secrets","Object":"MySecret"}
 ~~~
 
 If a field supports PAM but should not use PAM, simply enter in the actual value to be used instead of the `json` format object above.
@@ -148,9 +149,16 @@ The Keyfactor service and IIS Server should be restarted after making these chan
 
 
 For registering the CyberArk for use with the SDK-based Credential Provider, use the following `<register>` instead.
+Make sure to enter in the correct full path to the directory for `extensionPath` that has the SDK DLL for the PAM Provider.
 
 ```xml
-<register type="IPAMProvider" mapTo="Keyfactor.Extensions.Pam.CyberArk.SdkCredentialProviderPAM, cyberark-credentialprovider-pam" name="CyberArk-SdkCredentialProvider" />
+<register type="IPAMProvider" mapTo="Keyfactor.Extensions.Pam.CyberArk.SdkCredentialProviderPAM, cyberark-credentialprovider-pam" name="CyberArk-SdkCredentialProvider">
+  <constructor>
+    <param name="extensionPath">
+      <value value="C:\Program Files\Keyfactor\Keyfactor Platform\WebAgentServices\bin"/>
+    </param>
+  </constructor>
+</register>
 ```
 
 ##### Usage
