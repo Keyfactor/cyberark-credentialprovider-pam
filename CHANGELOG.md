@@ -1,4 +1,4 @@
-2.1.0
+2.1.0 
 - Added additional parameter option when using Unity Configuration to target the correct directory with the Net Password SDK DLL
 - Added additional parameter option when using Unity Configuration to specify if the Net Framework or Net Standard Password SDK should be used
 - Improve logging and error handling to report errors correctly
