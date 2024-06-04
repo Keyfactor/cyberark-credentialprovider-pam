@@ -1,3 +1,8 @@
+2.1.0 
+- Added additional parameter option when using Unity Configuration to target the correct directory with the Net Password SDK DLL
+- Added additional parameter option when using Unity Configuration to specify if the Net Framework or Net Standard Password SDK should be used
+- Improve logging and error handling to report errors correctly
+
 2.0.1
 - Bug fix for DLL compatibility issue preventing CyberArk from loading correctly on the Keyfactor Platform
 - Include `manifest.json` and alternate `SDK-manifest.json` files and instructions on their use
