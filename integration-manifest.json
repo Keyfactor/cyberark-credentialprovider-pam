@@ -1,89 +1,91 @@
 {
-    "$schema": "https://keyfactor.github.io/integration-manifest-schema.json",
-    "integration_type": "pam",
-    "name": "CyberArk PAM Provider",
-    "status": "production",
-    "support_level": "kf-supported",
-    "link_github": false,
-    "description": "A Keyfactor PAM Provider plugin supporting credential retrieval with a CyberArk Credential Provider. The Central Credential Provider (cloud-hosted) can be used, or the standard Credential Provider with installed SDK.",
-    "about": {
-        "pam": {
-            "providerName": "CyberArk Central Credential Provider",
-            "assemblyName": "cyberark-credentialprovider-pam",
-            "dbName": "CyberArk-CentralCredentialProvider",
-            "fullyQualifiedClassName": "Keyfactor.Extensions.Pam.CyberArk.CentralCredentialProviderPAM",
-            "pam_types": {
-                "CyberArk-CentralCredentialProvider": {
-                    "Name": "CyberArk-CentralCredentialProvider",
-                    "Parameters": [
-                        {
-                            "Name": "AppId",
-                            "DisplayName": "Application ID",
-                            "DataType": 1,
-                            "InstanceLevel": false
-                        },
-                        {
-                            "Name": "Host",
-                            "DisplayName": "CyberArk Host and Port",
-                            "DataType": 1,
-                            "InstanceLevel": false
-                        },
-                        {
-                            "Name": "Site",
-                            "DisplayName": "CyberArk API Site",
-                            "DataType": 1,
-                            "InstanceLevel": false
-                        },
-                        {
-                            "Name": "Safe",
-                            "DisplayName": "Safe",
-                            "DataType": 1,
-                            "InstanceLevel": true
-                        },
-                        {
-                            "Name": "Folder",
-                            "DisplayName": "Folder",
-                            "DataType": 1,
-                            "InstanceLevel": true
-                        },
-                        {
-                            "Name": "Object",
-                            "DisplayName": "Object",
-                            "DataType": 1,
-                            "InstanceLevel": true
-                        }
-                    ]
-                },
-                "CyberArk-SdkCredentialProvider": {
-                    "Name": "CyberArk-SdkCredentialProvider",
-                    "Parameters": [
-                        {
-                            "Name": "AppId",
-                            "DisplayName": "Application ID",
-                            "DataType": 1,
-                            "InstanceLevel": false
-                        },
-                        {
-                            "Name": "Safe",
-                            "DisplayName": "Safe",
-                            "DataType": 1,
-                            "InstanceLevel": true
-                        },
-                        {
-                            "Name": "Folder",
-                            "DisplayName": "Folder",
-                            "DataType": 1,
-                            "InstanceLevel": true
-                        },
-                        {
-                            "Name": "Object",
-                            "DisplayName": "Object",
-                            "DataType": 1,
-                            "InstanceLevel": true
-                        }
-                    ]
-                }
+  "$schema": "https://keyfactor.github.io/integration-manifest-schema.json",
+  "integration_type": "pam",
+  "name": "CyberArk PAM Provider",
+  "status": "production",
+  "support_level": "kf-supported",
+  "link_github": false,
+  "update_catalog": true,
+  "release_dir": "cyberark-credentialprovider-pam/bin/Release/netstandard2.0",
+  "description": "A Keyfactor PAM Provider plugin supporting credential retrieval with a CyberArk Credential Provider. The Central Credential Provider (cloud-hosted) can be used, or the standard Credential Provider with installed SDK.",
+  "about": {
+    "pam": {
+      "providerName": "CyberArk Central Credential Provider",
+      "assemblyName": "cyberark-credentialprovider-pam",
+      "dbName": "CyberArk-CentralCredentialProvider",
+      "fullyQualifiedClassName": "Keyfactor.Extensions.Pam.CyberArk.CentralCredentialProviderPAM",
+      "pam_types": {
+        "CyberArk-CentralCredentialProvider": {
+          "Name": "CyberArk-CentralCredentialProvider",
+          "Parameters": [
+            {
+              "Name": "AppId",
+              "DisplayName": "Application ID",
+              "DataType": 1,
+              "InstanceLevel": false
+            },
+            {
+              "Name": "Host",
+              "DisplayName": "CyberArk Host and Port",
+              "DataType": 1,
+              "InstanceLevel": false
+            },
+            {
+              "Name": "Site",
+              "DisplayName": "CyberArk API Site",
+              "DataType": 1,
+              "InstanceLevel": false
+            },
+            {
+              "Name": "Safe",
+              "DisplayName": "Safe",
+              "DataType": 1,
+              "InstanceLevel": true
+            },
+            {
+              "Name": "Folder",
+              "DisplayName": "Folder",
+              "DataType": 1,
+              "InstanceLevel": true
+            },
+            {
+              "Name": "Object",
+              "DisplayName": "Object",
+              "DataType": 1,
+              "InstanceLevel": true
             }
+          ]
+        },
+        "CyberArk-SdkCredentialProvider": {
+          "Name": "CyberArk-SdkCredentialProvider",
+          "Parameters": [
+            {
+              "Name": "AppId",
+              "DisplayName": "Application ID",
+              "DataType": 1,
+              "InstanceLevel": false
+            },
+            {
+              "Name": "Safe",
+              "DisplayName": "Safe",
+              "DataType": 1,
+              "InstanceLevel": true
+            },
+            {
+              "Name": "Folder",
+              "DisplayName": "Folder",
+              "DataType": 1,
+              "InstanceLevel": true
+            },
+            {
+              "Name": "Object",
+              "DisplayName": "Object",
+              "DataType": 1,
+              "InstanceLevel": true
+            }
+          ]
         }
+      }
     }
+  }
 }
