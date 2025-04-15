@@ -1,7 +1,8 @@
 ## Overview
-The CyberArk SDK
+The Cyber Ark SDK Credential Provider uses the Cyber Ark SDK in order to communicate with a locally installed Credential Provider.
+When the Credential Provider is installed locally, authentication needs to be configured correctly for the provider to communicate with a Cyber Ark instance over their proprietary protocol.
 
-### Requirements
+## Requirements
 To use a local Credential Provider instead, the Credential Provider will need to be installed on the machine that is using the PAM Provider. After installing the Credential Provider, copy the `NetStandardPasswordSDK.dll` assembly from the install location into the PAM Provider install location. This dll __needs__ to be adjacent to `cyberark-credentialprovider-pam.dll` to be properly loaded.
 __Important__: When running the SDK Credential Provider on Keyfactor Command versions prior to version 11, the `NetPasswordSDK.dll` needs to be copied instead of `NetStandardPasswordSDK.dll`. This library is compatible with .NET Framework which is necessary to work in Keyfactor Command.
 
