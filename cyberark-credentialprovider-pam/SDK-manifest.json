@@ -3,7 +3,11 @@
       "Keyfactor.Platform.Extensions.IPAMProvider": {
         "PAMProviders.CyberArk-SdkCredentialProvider.PAMProvider": {
           "assemblyPath": "cyberark-credentialprovider-pam.dll",
-          "TypeFullName": "Keyfactor.Extensions.Pam.CyberArk.SdkCredentialProviderPAM"
+          "TypeFullName": "Keyfactor.Extensions.Pam.CyberArk.SdkCredentialProviderPAM",
+          "Options": {
+            "SdkPath": "", // if left blank, will use the same location as the pam dll
+            "UsingFrameworkSdk": false
+          }
         }
       }
     },
