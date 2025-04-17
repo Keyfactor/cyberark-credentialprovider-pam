@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Keyfactor.Extensions.Pam.CyberArk.Providers;
 using Keyfactor.Logging;
 using Keyfactor.Platform.Extensions;
 using Microsoft.Extensions.Logging;
@@ -33,6 +32,12 @@ namespace Keyfactor.Extensions.Pam.CyberArk
         private readonly string SdkPath;
         private readonly bool UsingFrameworkSdk;
 
+        public class Options
+        {
+            public string SdkPath { get; set; }
+            public bool UsingFrameworkSdk { get; set; }
+        }
+
         public SdkCredentialProviderPAM()
         {
             Logger = LogHandler.GetClassLogger<SdkCredentialProviderPAM>();
@@ -45,11 +50,11 @@ namespace Keyfactor.Extensions.Pam.CyberArk
             Logger.LogInformation($"{Name} determined it will use the following directory to load the SDK: {SdkPath}");
         }
 
-        public SdkCredentialProviderPAM(IOptions<SdkOptions> options)
+        public SdkCredentialProviderPAM(IOptions<Options> options)
         {
             Logger = LogHandler.GetClassLogger<SdkCredentialProviderPAM>();
             Logger.LogTrace($"Starting up {Name} with Options provided.");
-            Logger.LogTrace($"Reading option UseFrameworkLibrary to determine which SDK constants to load.");
+            Logger.LogTrace($"Reading option UsingFrameworkSdk to determine which SDK constants to load.");
             UsingFrameworkSdk = options.Value.UsingFrameworkSdk;
             if (UsingFrameworkSdk)
             {
