@@ -83,12 +83,12 @@ namespace Keyfactor.Extensions.Pam.CyberArk
         public string GetPassword(Dictionary<string, string> instanceParameters, Dictionary<string, string> initializationInfo)
         {
             string appId = GetRequiredValue(initializationInfo, "AppId");
-            Logger.LogInformation($"Configured with Initialization Parameters: AppId = {appId}");
+            Logger.LogDebug($"Configured with Initialization Parameters: AppId = {appId}");
 
             string safe = GetRequiredValue(instanceParameters, "Safe");
             string folder = GetRequiredValue(instanceParameters, "Folder");
             string obj = GetRequiredValue(instanceParameters, "Object");
-            Logger.LogInformation($"Configured with Instance Parameters: Safe = {safe} ; Folder = {folder} ; Object = {obj}");
+            Logger.LogDebug($"Configured with Instance Parameters: Safe = {safe} ; Folder = {folder} ; Object = {obj}");
 
             string dll = Path.Combine(SdkPath, SDKConstants.DLL);
             Logger.LogDebug($"Loading DLL: {dll}");

@@ -2,6 +2,7 @@
 - Add IOptions support for the SdkCredentialProvider
   - This is the manifest.json supported standard that replaces Unity config files and parameters
 - Update documentation to doctool
+- Add logging to Central Credential Provider
 
 2.1.0 
 - Added additional parameter option when using Unity Configuration to target the correct directory with the Net Password SDK DLL
