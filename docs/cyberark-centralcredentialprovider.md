@@ -11,3 +11,10 @@ Certificate Authentication is not currently supported and needs to be disabled. 
 
 
 
+
+## Mechanics
+The `CyberArk-CentralCredentialProvider` PAM Provider Type communicates to a Cyber Ark instance using HTTPS. REST API calls are made to the host and site specified.
+As Client Certificate Auth is not currently supported, the target Site on the Cyber Ark instance needs to not require a certificate for authentication.
+
+Importantly, the way authentication and restriction works for requests with the Central Credential provider are determined by the Application Id used. Additional rules can be set in Cyber Ark to enact restrictions on where the request for an Application Id needs to come from.
+After the Application Id is approved, the Central Credential Provider passes calls through an internally specified Provider object in Cyber Ark to the Vault.
