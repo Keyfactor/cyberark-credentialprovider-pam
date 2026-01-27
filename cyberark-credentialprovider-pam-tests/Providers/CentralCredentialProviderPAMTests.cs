@@ -129,22 +129,24 @@ public class CentralCredentialProviderPAMTests
         // Arrange
         var initializationInfo = new Dictionary<string, string>()
         {
-            { "AppId", Secrets.AppId },
-            { "Host", Secrets.Host },
-            { "Site", Secrets.Site }
+            { "AppId", "TestAppId" },
+            { "Host", "TestHost" },
+            { "Site", "TestSite" }
         };
 
         var instanceParams = new Dictionary<string, string>()
         {
-            {"Safe", Secrets.Safe },
-            {"Folder", Secrets.Folder },
-            {"Object", Secrets.Object },
+            {"Safe", "TestSafe" },
+            {"Folder", "TestFolder" },
+            {"Object", "TestObject"},
         };
+
+        var expectedSecret = "foobar";
 
         var httpResponse = new HttpResponseMessage()
         {
             StatusCode = HttpStatusCode.OK,
-            Content = new StringContent($"{{\"Content\":\"{Secrets.ExpectedSecret}\"}}")
+            Content = new StringContent($"{{\"Content\":\"{expectedSecret}\"}}")
         };
 
         _mockConjurHttpClient
@@ -156,7 +158,7 @@ public class CentralCredentialProviderPAMTests
         var password = _sut.GetPassword(instanceParams, initializationInfo);
         
         // Assert
-        Assert.Equal(Secrets.ExpectedSecret, password);
+        Assert.Equal(expectedSecret, password);
     }
     
     [Fact]
@@ -165,15 +167,15 @@ public class CentralCredentialProviderPAMTests
         // Arrange
         var initializationInfo = new Dictionary<string, string>()
         {
-            { "AppId", Secrets.AppId },
-            { "Host", Secrets.Host },
-            { "Site", Secrets.Site }
+            { "AppId", "TestAppId" },
+            { "Host", "TestHost" },
+            { "Site", "TestSite" }
         };
 
         var instanceParams = new Dictionary<string, string>()
         {
-            {"Safe", Secrets.Safe },
-            {"Folder", Secrets.Folder },
+            {"Safe", "TestSafe" },
+            {"Folder", "TestFolder" },
             {"Object", "objectdoesnotexist"},
         };
         
