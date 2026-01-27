@@ -17,6 +17,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using Keyfactor.Extensions.Pam.CyberArk.Clients;
 using Keyfactor.Logging;
 using Microsoft.Extensions.Logging;
 
@@ -25,17 +26,20 @@ namespace Keyfactor.Extensions.Pam.CyberArk
     public class CentralCredentialProviderPAM : CyberArkProvider, IPAMProvider
     {
         private readonly ILogger _logger;
+        private readonly IConjurHttpClient _httpClient;
 
         // Default constructor used by agent services
         public CentralCredentialProviderPAM()
         {
             _logger = LogHandler.GetClassLogger<CentralCredentialProviderPAM>();
+            _httpClient = new ConjurHttpClient(_logger);
         }
 
         // Constructor used by unit tests
-        public CentralCredentialProviderPAM(ILogger logger)
+        public CentralCredentialProviderPAM(ILogger logger, IConjurHttpClient httpClient)
         {
             _logger = logger;
+            _httpClient = httpClient;
         }
         
         public string Name => "CyberArk-CentralCredentialProvider";
@@ -59,14 +63,10 @@ namespace Keyfactor.Extensions.Pam.CyberArk
             
             _logger.LogDebug($"Safe: {safe}, Folder: {folder}, Object: {obj}");
 
-            var http = new HttpClient();
-            http.BaseAddress = new Uri($"https://{host}/");
-
-            var path = $"{site}/api/Accounts?AppID={appId}&Safe={safe};Folder={folder};Object={obj}";
+            var baseAddress = $"https://{host}/";
             
-            _logger.LogDebug($"Fetching secret from path: {path}");
+            var response = _httpClient.GetPassword(baseAddress, site, appId, safe, folder, obj);
             
-            var response = http.GetAsync(path).GetAwaiter().GetResult();
             string json = ReadHttpResponse(response);
             var account = JsonConvert.DeserializeObject<AccountsResponse>(json);
             
@@ -82,8 +82,10 @@ namespace Keyfactor.Extensions.Pam.CyberArk
             _logger.MethodEntry();
             
             _logger.LogDebug("Reading HTTP response from CyberArk Central Credential Provider...");
-            
-            string responseMessage = response.Content.ReadAsStringAsync().Result;
+
+            string responseMessage = response.Content.ReadAsStringAsync()
+                .GetAwaiter()
+                .GetResult();
             
             _logger.LogDebug($"Request returned status code: {(int)response.StatusCode} {response.StatusCode}");
             

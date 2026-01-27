@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Net;
 using Keyfactor.Extensions.Pam.CyberArk;
+using Keyfactor.Extensions.Pam.CyberArk.Clients;
 using MartinCostello.Logging.XUnit;
 using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit.Abstractions;
 
 namespace cyberark_credentialprovider_pam_tests.Providers;
@@ -22,6 +25,7 @@ namespace cyberark_credentialprovider_pam_tests.Providers;
 public class CentralCredentialProviderPAMTests
 {
     private readonly CentralCredentialProviderPAM _sut;
+    private readonly Mock<IConjurHttpClient> _mockConjurHttpClient;
     
     public CentralCredentialProviderPAMTests(ITestOutputHelper output)
     {
@@ -29,8 +33,10 @@ public class CentralCredentialProviderPAMTests
             builder.AddProvider(new XUnitLoggerProvider(output, new XUnitLoggerOptions()))
                 .SetMinimumLevel(LogLevel.Trace));
         var logger = loggerFactory.CreateLogger<CentralCredentialProviderPAMTests>();
+
+        _mockConjurHttpClient = new Mock<IConjurHttpClient>();
         
-        _sut = new CentralCredentialProviderPAM(logger);
+        _sut = new CentralCredentialProviderPAM(logger, _mockConjurHttpClient.Object);
     }
     
     [Theory]
@@ -135,8 +141,21 @@ public class CentralCredentialProviderPAMTests
             {"Object", Secrets.Object },
         };
 
+        var httpResponse = new HttpResponseMessage()
+        {
+            StatusCode = HttpStatusCode.OK,
+            Content = new StringContent($"{{\"Content\":\"{Secrets.ExpectedSecret}\"}}")
+        };
+
+        _mockConjurHttpClient
+            .Setup(p => p.GetPassword(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>()))
+            .Returns(httpResponse);
+
+        // Act
         var password = _sut.GetPassword(instanceParams, initializationInfo);
         
+        // Assert
         Assert.Equal(Secrets.ExpectedSecret, password);
     }
     
@@ -157,9 +176,22 @@ public class CentralCredentialProviderPAMTests
             {"Folder", Secrets.Folder },
             {"Object", "objectdoesnotexist"},
         };
+        
+        var httpResponse = new HttpResponseMessage()
+        {
+            StatusCode = HttpStatusCode.NotFound,
+            Content = new StringContent($"{{\"ErrorCode\":\"APPAP004E\",\"ErrorMsg\":\"Password object matching query [Safe=partner;Folder=Root\\\\Secrets;Object=objectdoesnotexist] was not found (Diagnostic Info: 5). Please check that there is a password object that answers your query in the Vault and that both the Provider and the application user have the appropriate permissions needed in order to use the password.\"}}")
+        };
+        
+        _mockConjurHttpClient
+            .Setup(p => p.GetPassword(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>()))
+            .Returns(httpResponse);
 
+        // Act
         var exception = Assert.Throws<HttpClientException>(() => _sut.GetPassword(instanceParams, initializationInfo));
         
+        // Assert
         Assert.Equal("Failed to retrieve secret from CyberArk Central Credential Provider. Status Code: 404 (NotFound). Response message: {\"ErrorCode\":\"APPAP004E\",\"ErrorMsg\":\"Password object matching query [Safe=partner;Folder=Root\\\\Secrets;Object=objectdoesnotexist] was not found (Diagnostic Info: 5). Please check that there is a password object that answers your query in the Vault and that both the Provider and the application user have the appropriate permissions needed in order to use the password.\"}", exception.Message);
     }
 }
