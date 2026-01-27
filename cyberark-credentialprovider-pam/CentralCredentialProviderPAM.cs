@@ -17,45 +17,88 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using Keyfactor.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Keyfactor.Extensions.Pam.CyberArk
 {
     public class CentralCredentialProviderPAM : CyberArkProvider, IPAMProvider
     {
+        private readonly ILogger _logger;
+
+        // Default constructor used by agent services
+        public CentralCredentialProviderPAM()
+        {
+            _logger = LogHandler.GetClassLogger<CentralCredentialProviderPAM>();
+        }
+
+        // Constructor used by unit tests
+        public CentralCredentialProviderPAM(ILogger logger)
+        {
+            _logger = logger;
+        }
+        
         public string Name => "CyberArk-CentralCredentialProvider";
 
         public string GetPassword(Dictionary<string, string> instanceParameters, Dictionary<string, string> initializationInfo)
         {
+            _logger.MethodEntry();
+            
+            _logger.LogTrace("InitializationInfo: {}", JsonConvert.SerializeObject(initializationInfo));
+            _logger.LogTrace("InstanceParameters: {}", JsonConvert.SerializeObject(instanceParameters));
+            
             string appId = GetRequiredValue(initializationInfo, "AppId");
             string host = GetRequiredValue(initializationInfo, "Host");
             string site = GetRequiredValue(initializationInfo, "Site");
+            
+            _logger.LogDebug($"App ID: {appId}, Host: {host}, Site: {site}");
 
             string safe = GetRequiredValue(instanceParameters, "Safe");
             string folder = GetRequiredValue(instanceParameters, "Folder");
             string obj = GetRequiredValue(instanceParameters, "Object");
+            
+            _logger.LogDebug($"Safe: {safe}, Folder: {folder}, Object: {obj}");
 
             var http = new HttpClient();
             http.BaseAddress = new Uri($"https://{host}/");
 
             var path = $"{site}/api/Accounts?AppID={appId}&Safe={safe};Folder={folder};Object={obj}";
-            var response = http.GetAsync(path).Result;
+            
+            _logger.LogDebug($"Fetching secret from path: {path}");
+            
+            var response = http.GetAsync(path).GetAwaiter().GetResult();
             string json = ReadHttpResponse(response);
             var account = JsonConvert.DeserializeObject<AccountsResponse>(json);
+            
+            _logger.LogInformation($"Successfully retrieved secret for object '{obj}' from safe '{safe}'.");
+            
+            _logger.MethodExit();
 
             return account.Content;
         }
 
         private string ReadHttpResponse(HttpResponseMessage response)
         {
+            _logger.MethodEntry();
+            
+            _logger.LogDebug("Reading HTTP response from CyberArk Central Credential Provider...");
+            
             string responseMessage = response.Content.ReadAsStringAsync().Result;
+            
+            _logger.LogDebug($"Request returned status code: {(int)response.StatusCode} {response.StatusCode}");
+            
             if (response.IsSuccessStatusCode)
             {
+                _logger.LogDebug("Successfully retrieved secret from CyberArk Central Credential Provider.");
+                
+                _logger.MethodExit();
                 return responseMessage;
             }
-            else
-            {
-                throw new HttpClientException(responseMessage, response.StatusCode);
-            }
+            
+            _logger.LogCritical("Failed to retrieve secret from CyberArk Central Credential Provider. " +
+                                    $"\nError: {responseMessage}");
+            
+            throw new HttpClientException(responseMessage, response.StatusCode);
         }
     }
 }

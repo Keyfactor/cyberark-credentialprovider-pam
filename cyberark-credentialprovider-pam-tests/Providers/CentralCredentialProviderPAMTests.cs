@@ -13,6 +13,9 @@
 // limitations under the License.
 
 using Keyfactor.Extensions.Pam.CyberArk;
+using MartinCostello.Logging.XUnit;
+using Microsoft.Extensions.Logging;
+using Xunit.Abstractions;
 
 namespace cyberark_credentialprovider_pam_tests.Providers;
 
@@ -20,9 +23,14 @@ public class CentralCredentialProviderPAMTests
 {
     private readonly CentralCredentialProviderPAM _sut;
     
-    public CentralCredentialProviderPAMTests()
+    public CentralCredentialProviderPAMTests(ITestOutputHelper output)
     {
-        _sut = new CentralCredentialProviderPAM();
+        var loggerFactory = LoggerFactory.Create(builder =>
+            builder.AddProvider(new XUnitLoggerProvider(output, new XUnitLoggerOptions()))
+                .SetMinimumLevel(LogLevel.Trace));
+        var logger = loggerFactory.CreateLogger<CentralCredentialProviderPAMTests>();
+        
+        _sut = new CentralCredentialProviderPAM(logger);
     }
     
     [Theory]
