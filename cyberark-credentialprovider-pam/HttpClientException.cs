@@ -21,28 +21,7 @@ namespace Keyfactor.Extensions.Pam.CyberArk
     [Serializable]
     public class HttpClientException : Exception
     {
-        private string responseMessage;
-        private HttpStatusCode statusCode;
-
-        public HttpClientException()
-        {
-        }
-
-        public HttpClientException(string message) : base(message)
-        {
-        }
-
-        public HttpClientException(string responseMessage, HttpStatusCode statusCode)
-        {
-            this.responseMessage = responseMessage;
-            this.statusCode = statusCode;
-        }
-
-        public HttpClientException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-
-        protected HttpClientException(SerializationInfo info, StreamingContext context) : base(info, context)
+        public HttpClientException(string responseMessage, HttpStatusCode statusCode) : base($"Failed to retrieve secret from CyberArk Central Credential Provider. Status Code: {(int)statusCode} ({statusCode}). Response message: {responseMessage}")
         {
         }
     }

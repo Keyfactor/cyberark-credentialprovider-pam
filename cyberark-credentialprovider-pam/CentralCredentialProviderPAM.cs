@@ -95,9 +95,6 @@ namespace Keyfactor.Extensions.Pam.CyberArk
                 return responseMessage;
             }
             
-            _logger.LogCritical("Failed to retrieve secret from CyberArk Central Credential Provider. " +
-                                    $"\nError: {responseMessage}");
-            
             throw new HttpClientException(responseMessage, response.StatusCode);
         }
     }

@@ -160,6 +160,6 @@ public class CentralCredentialProviderPAMTests
 
         var exception = Assert.Throws<HttpClientException>(() => _sut.GetPassword(instanceParams, initializationInfo));
         
-        Assert.Equal("Exception of type 'Keyfactor.Extensions.Pam.CyberArk.HttpClientException' was thrown.", exception.Message);
+        Assert.Equal("Failed to retrieve secret from CyberArk Central Credential Provider. Status Code: 404 (NotFound). Response message: {\"ErrorCode\":\"APPAP004E\",\"ErrorMsg\":\"Password object matching query [Safe=partner;Folder=Root\\\\Secrets;Object=objectdoesnotexist] was not found (Diagnostic Info: 5). Please check that there is a password object that answers your query in the Vault and that both the Provider and the application user have the appropriate permissions needed in order to use the password.\"}", exception.Message);
     }
 }
