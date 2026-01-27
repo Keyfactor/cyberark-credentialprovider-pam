@@ -162,6 +162,90 @@ public class CentralCredentialProviderPAMTests
     }
     
     [Fact]
+    public void GetPassword_HostDoesNotIncludeScheme_AddsHttpsScheme()
+    {
+        // Arrange
+        var initializationInfo = new Dictionary<string, string>()
+        {
+            { "AppId", "TestAppId" },
+            { "Host", "test.example.com:1234" },
+            { "Site", "TestSite" }
+        };
+
+        var instanceParams = new Dictionary<string, string>()
+        {
+            {"Safe", "TestSafe" },
+            {"Folder", "TestFolder" },
+            {"Object", "TestObject"},
+        };
+        
+        var expectedHostname = "https://test.example.com:1234/";
+
+        var expectedSecret = "foobar";
+
+        var httpResponse = new HttpResponseMessage()
+        {
+            StatusCode = HttpStatusCode.OK,
+            Content = new StringContent($"{{\"Content\":\"{expectedSecret}\"}}")
+        };
+
+        _mockConjurHttpClient
+            .Setup(p => p.GetPassword(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>()))
+            .Returns(httpResponse);
+
+        // Act
+        var password = _sut.GetPassword(instanceParams, initializationInfo);
+        
+        // Assert
+        _mockConjurHttpClient.Verify(p => p.GetPassword(expectedHostname, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+            It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+    }
+    
+    [Theory]
+    [InlineData("https://test.example.com:1234/")]
+    [InlineData("http://test.example.com:1234/")]
+    public void GetPassword_HostIncludesScheme_KeepsProvidedScheme(string host)
+    {
+        // Arrange
+        var initializationInfo = new Dictionary<string, string>()
+        {
+            { "AppId", "TestAppId" },
+            { "Host", host },
+            { "Site", "TestSite" }
+        };
+
+        var instanceParams = new Dictionary<string, string>()
+        {
+            {"Safe", "TestSafe" },
+            {"Folder", "TestFolder" },
+            {"Object", "TestObject"},
+        };
+        
+        var expectedHostname = host;
+
+        var expectedSecret = "foobar";
+
+        var httpResponse = new HttpResponseMessage()
+        {
+            StatusCode = HttpStatusCode.OK,
+            Content = new StringContent($"{{\"Content\":\"{expectedSecret}\"}}")
+        };
+
+        _mockConjurHttpClient
+            .Setup(p => p.GetPassword(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>()))
+            .Returns(httpResponse);
+
+        // Act
+        var password = _sut.GetPassword(instanceParams, initializationInfo);
+        
+        // Assert
+        _mockConjurHttpClient.Verify(p => p.GetPassword(expectedHostname, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+            It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+    }
+    
+    [Fact]
     public void GetPassword_ObjectDoesNotExist_ThrowsException()
     {
         // Arrange

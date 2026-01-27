@@ -1,4 +1,5 @@
 using System.Net.Http;
+using Keyfactor.Logging;
 using Microsoft.Extensions.Logging;
 using Uri = System.Uri;
 
@@ -53,15 +54,23 @@ namespace Keyfactor.Extensions.Pam.CyberArk.Clients
         
         public HttpResponseMessage GetPassword(string baseAddress, string site, string appId, string safe, string folder, string obj)
         {
+            _logger.MethodEntry();
+            
             using (HttpClient http = new HttpClient())
             {
+                _logger.LogTrace($"Base address: {baseAddress}");
+                
                 http.BaseAddress = new Uri(baseAddress);
 
                 var path = $"{site}/api/Accounts?AppID={appId}&Safe={safe};Folder={folder};Object={obj}";
             
                 _logger.LogDebug($"Fetching secret from path: {path}");
-            
-                return http.GetAsync(path).GetAwaiter().GetResult();
+                
+                var response = http.GetAsync(path).GetAwaiter().GetResult();
+
+                _logger.MethodExit();
+                
+                return response;
             };
         }
     }

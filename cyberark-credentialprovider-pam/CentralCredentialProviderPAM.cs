@@ -55,15 +55,22 @@ namespace Keyfactor.Extensions.Pam.CyberArk
             string host = GetRequiredValue(initializationInfo, "Host");
             string site = GetRequiredValue(initializationInfo, "Site");
             
-            _logger.LogDebug($"App ID: {appId}, Host: {host}, Site: {site}");
+            _logger.LogTrace("Retrieved required initialization parameters:");
+            _logger.LogTrace($"App ID: {appId}, Host: {host}, Site: {site}");
 
             string safe = GetRequiredValue(instanceParameters, "Safe");
             string folder = GetRequiredValue(instanceParameters, "Folder");
             string obj = GetRequiredValue(instanceParameters, "Object");
             
+            _logger.LogDebug("Retrieved required instance parameters:");
             _logger.LogDebug($"Safe: {safe}, Folder: {folder}, Object: {obj}");
 
-            var baseAddress = $"https://{host}/";
+            var baseAddress = host;
+            if (!host.StartsWith("http"))
+            {
+                _logger.LogTrace($"Host '{host}' does not include scheme. Prepending 'https://'.");
+                baseAddress = $"https://{host}";
+            }
             
             var response = _httpClient.GetPassword(baseAddress, site, appId, safe, folder, obj);
             
