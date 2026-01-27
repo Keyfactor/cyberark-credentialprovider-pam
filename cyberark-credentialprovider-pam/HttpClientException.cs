@@ -19,7 +19,7 @@ using System.Runtime.Serialization;
 namespace Keyfactor.Extensions.Pam.CyberArk
 {
     [Serializable]
-    internal class HttpClientException : Exception
+    public class HttpClientException : Exception
     {
         private string responseMessage;
         private HttpStatusCode statusCode;
