@@ -27,6 +27,15 @@ public class CentralCredentialProviderPAMTests
     private readonly CentralCredentialProviderPAM _sut;
     private readonly Mock<IConjurHttpClient> _mockConjurHttpClient;
     
+    // Test data constants
+    private const string ExpectedSecret = "foobar";
+    private const string TestAppId = "TestAppId";
+    private const string TestHost = "TestHost";
+    private const string TestSite = "TestSite";
+    private const string TestSafe = "TestSafe";
+    private const string TestFolder = "TestFolder";
+    private const string TestObject = "TestObject";
+    
     public CentralCredentialProviderPAMTests(ITestOutputHelper output)
     {
         var loggerFactory = LoggerFactory.Create(builder =>
@@ -39,6 +48,39 @@ public class CentralCredentialProviderPAMTests
         _sut = new CentralCredentialProviderPAM(logger, _mockConjurHttpClient.Object);
     }
     
+    private static Dictionary<string, string> CreateInitializationInfo() => new()
+    {
+        { "AppId", TestAppId },
+        { "Host", TestHost },
+        { "Site", TestSite }
+    };
+
+    private static Dictionary<string, string> CreateInstanceParams() => new()
+    {
+        { "Safe", TestSafe },
+        { "Folder", TestFolder },
+        { "Object", TestObject }
+    };
+    
+    private void SetupSuccessfulPasswordRetrieval(string secret = ExpectedSecret)
+    {
+        var httpResponse = new HttpResponseMessage
+        {
+            StatusCode = HttpStatusCode.OK,
+            Content = new StringContent($"{{\"Content\":\"{secret}\"}}")
+        };
+
+        _mockConjurHttpClient
+            .Setup(p => p.GetPassword(
+                It.IsAny<string>(), 
+                It.IsAny<string>(), 
+                It.IsAny<string>(), 
+                It.IsAny<string>(),
+                It.IsAny<string>(), 
+                It.IsAny<string>()))
+            .Returns(httpResponse);
+    }
+    
     [Theory]
     [InlineData("AppId")]
     [InlineData("Host")]
@@ -46,39 +88,21 @@ public class CentralCredentialProviderPAMTests
     public void GetPassword_MissingRequiredInitializationParameter_ThrowsException(string keyToRemove)
     {
         // Arrange
-        var initializationInfo = new Dictionary<string, string>()
-        {
-            { "AppId", "TestAppId" },
-            { "Host", "TestHost" },
-            { "Site", "TestSite" }
-        };
-
-        var instanceParams = new Dictionary<string, string>()
-        {
-            {"Safe", "TestSafe"},
-            {"Folder", "TestFolder"},
-            {"Object", "TestObject"},
-        };
+        var initializationInfo = CreateInitializationInfo();
+        var instanceParams = CreateInstanceParams();
+        var expectedMessage = $"Required field {keyToRemove} was missing a value or was not defined as expected in dictionary.";
         
-        // Scenario 1: Key is missing from dictionary
-
+        // Act & Assert - Scenario 1: Key is missing from dictionary
         initializationInfo.Remove(keyToRemove);
+        var exception1 = Assert.Throws<ArgumentException>(() => 
+            _sut.GetPassword(instanceParams, initializationInfo));
+        Assert.Equal(expectedMessage, exception1.Message);
         
-        // Act
-        var exception1 = Assert.Throws<ArgumentException>(() => _sut.GetPassword(instanceParams, initializationInfo));
-        
-        // Assert
-        Assert.Equal($"Required field {keyToRemove} was missing a value or was not defined as expected in dictionary.", exception1.Message);
-        
-        
-        // Scenario 2: Key is present but value is null or whitespace
+        // Act & Assert - Scenario 2: Key is present but value is empty
         initializationInfo[keyToRemove] = "";
-        
-        // Act
-        var exception2 = Assert.Throws<ArgumentException>(() => _sut.GetPassword(instanceParams, initializationInfo));
-        
-        // Assert
-        Assert.Equal($"Required field {keyToRemove} was missing a value or was not defined as expected in dictionary.", exception2.Message);
+        var exception2 = Assert.Throws<ArgumentException>(() => 
+            _sut.GetPassword(instanceParams, initializationInfo));
+        Assert.Equal(expectedMessage, exception2.Message);
     }
     
     [Theory]
@@ -88,118 +112,61 @@ public class CentralCredentialProviderPAMTests
     public void GetPassword_MissingRequiredInstanceParameter_ThrowsException(string keyToRemove)
     {
         // Arrange
-        var initializationInfo = new Dictionary<string, string>()
-        {
-            { "AppId", "TestAppId" },
-            { "Host", "TestHost" },
-            { "Site", "TestSite" }
-        };
-
-        var instanceParams = new Dictionary<string, string>()
-        {
-            {"Safe", "TestSafe"},
-            {"Folder", "TestFolder"},
-            {"Object", "TestObject"},
-        };
+        var initializationInfo = CreateInitializationInfo();
+        var instanceParams = CreateInstanceParams();
+        var expectedMessage = $"Required field {keyToRemove} was missing a value or was not defined as expected in dictionary.";
         
-        // Scenario 1: Key is missing from dictionary
-
+        // Act & Assert - Scenario 1: Key is missing from dictionary
         instanceParams.Remove(keyToRemove);
+        var exception1 = Assert.Throws<ArgumentException>(() => 
+            _sut.GetPassword(instanceParams, initializationInfo));
+        Assert.Equal(expectedMessage, exception1.Message);
         
-        // Act
-        var exception1 = Assert.Throws<ArgumentException>(() => _sut.GetPassword(instanceParams, initializationInfo));
-        
-        // Assert
-        Assert.Equal($"Required field {keyToRemove} was missing a value or was not defined as expected in dictionary.", exception1.Message);
-        
-        
-        // Scenario 2: Key is present but value is null or whitespace
+        // Act & Assert - Scenario 2: Key is present but value is empty
         instanceParams[keyToRemove] = "";
-        
-        // Act
-        var exception2 = Assert.Throws<ArgumentException>(() => _sut.GetPassword(instanceParams, initializationInfo));
-        
-        // Assert
-        Assert.Equal($"Required field {keyToRemove} was missing a value or was not defined as expected in dictionary.", exception2.Message);
+        var exception2 = Assert.Throws<ArgumentException>(() => 
+            _sut.GetPassword(instanceParams, initializationInfo));
+        Assert.Equal(expectedMessage, exception2.Message);
     }
 
     [Fact]
     public void GetPassword_ValidConfiguration_ReturnsSecret()
     {
         // Arrange
-        var initializationInfo = new Dictionary<string, string>()
-        {
-            { "AppId", "TestAppId" },
-            { "Host", "TestHost" },
-            { "Site", "TestSite" }
-        };
-
-        var instanceParams = new Dictionary<string, string>()
-        {
-            {"Safe", "TestSafe" },
-            {"Folder", "TestFolder" },
-            {"Object", "TestObject"},
-        };
-
-        var expectedSecret = "foobar";
-
-        var httpResponse = new HttpResponseMessage()
-        {
-            StatusCode = HttpStatusCode.OK,
-            Content = new StringContent($"{{\"Content\":\"{expectedSecret}\"}}")
-        };
-
-        _mockConjurHttpClient
-            .Setup(p => p.GetPassword(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>()))
-            .Returns(httpResponse);
+        var initializationInfo = CreateInitializationInfo();
+        var instanceParams = CreateInstanceParams();
+        SetupSuccessfulPasswordRetrieval();
 
         // Act
         var password = _sut.GetPassword(instanceParams, initializationInfo);
         
         // Assert
-        Assert.Equal(expectedSecret, password);
+        Assert.Equal(ExpectedSecret, password);
     }
     
     [Fact]
     public void GetPassword_HostDoesNotIncludeScheme_AddsHttpsScheme()
     {
         // Arrange
-        var initializationInfo = new Dictionary<string, string>()
-        {
-            { "AppId", "TestAppId" },
-            { "Host", "test.example.com:1234" },
-            { "Site", "TestSite" }
-        };
-
-        var instanceParams = new Dictionary<string, string>()
-        {
-            {"Safe", "TestSafe" },
-            {"Folder", "TestFolder" },
-            {"Object", "TestObject"},
-        };
+        var initializationInfo = CreateInitializationInfo();
+        initializationInfo["Host"] = "test.example.com:1234";
         
+        var instanceParams = CreateInstanceParams();
         var expectedHostname = "https://test.example.com:1234/";
 
-        var expectedSecret = "foobar";
-
-        var httpResponse = new HttpResponseMessage()
-        {
-            StatusCode = HttpStatusCode.OK,
-            Content = new StringContent($"{{\"Content\":\"{expectedSecret}\"}}")
-        };
-
-        _mockConjurHttpClient
-            .Setup(p => p.GetPassword(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>()))
-            .Returns(httpResponse);
+        SetupSuccessfulPasswordRetrieval();
 
         // Act
-        var password = _sut.GetPassword(instanceParams, initializationInfo);
+        _sut.GetPassword(instanceParams, initializationInfo);
         
         // Assert
-        _mockConjurHttpClient.Verify(p => p.GetPassword(expectedHostname, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-            It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        _mockConjurHttpClient.Verify(p => p.GetPassword(
+            expectedHostname, 
+            It.IsAny<string>(), 
+            It.IsAny<string>(), 
+            It.IsAny<string>(),
+            It.IsAny<string>(), 
+            It.IsAny<string>()), Times.Once);
     }
     
     [Theory]
@@ -208,76 +175,56 @@ public class CentralCredentialProviderPAMTests
     public void GetPassword_HostIncludesScheme_KeepsProvidedScheme(string host)
     {
         // Arrange
-        var initializationInfo = new Dictionary<string, string>()
-        {
-            { "AppId", "TestAppId" },
-            { "Host", host },
-            { "Site", "TestSite" }
-        };
-
-        var instanceParams = new Dictionary<string, string>()
-        {
-            {"Safe", "TestSafe" },
-            {"Folder", "TestFolder" },
-            {"Object", "TestObject"},
-        };
+        var initializationInfo = CreateInitializationInfo();
+        initializationInfo["Host"] = host;
         
-        var expectedHostname = host;
-
-        var expectedSecret = "foobar";
-
-        var httpResponse = new HttpResponseMessage()
-        {
-            StatusCode = HttpStatusCode.OK,
-            Content = new StringContent($"{{\"Content\":\"{expectedSecret}\"}}")
-        };
-
-        _mockConjurHttpClient
-            .Setup(p => p.GetPassword(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>()))
-            .Returns(httpResponse);
+        var instanceParams = CreateInstanceParams();
+        SetupSuccessfulPasswordRetrieval();
 
         // Act
-        var password = _sut.GetPassword(instanceParams, initializationInfo);
+        _sut.GetPassword(instanceParams, initializationInfo);
         
         // Assert
-        _mockConjurHttpClient.Verify(p => p.GetPassword(expectedHostname, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-            It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        _mockConjurHttpClient.Verify(p => p.GetPassword(
+            host, 
+            It.IsAny<string>(), 
+            It.IsAny<string>(), 
+            It.IsAny<string>(),
+            It.IsAny<string>(), 
+            It.IsAny<string>()), Times.Once);
     }
     
     [Fact]
     public void GetPassword_ObjectDoesNotExist_ThrowsException()
     {
         // Arrange
-        var initializationInfo = new Dictionary<string, string>()
-        {
-            { "AppId", "TestAppId" },
-            { "Host", "TestHost" },
-            { "Site", "TestSite" }
-        };
-
-        var instanceParams = new Dictionary<string, string>()
-        {
-            {"Safe", "TestSafe" },
-            {"Folder", "TestFolder" },
-            {"Object", "objectdoesnotexist"},
-        };
+        var initializationInfo = CreateInitializationInfo();
+        var instanceParams = CreateInstanceParams();
+        instanceParams["Object"] = "objectdoesnotexist";
         
-        var httpResponse = new HttpResponseMessage()
+        var errorResponse = "{\"ErrorCode\":\"APPAP004E\",\"ErrorMsg\":\"Password object matching query [Safe=partner;Folder=Root\\\\Secrets;Object=objectdoesnotexist] was not found (Diagnostic Info: 5). Please check that there is a password object that answers your query in the Vault and that both the Provider and the application user have the appropriate permissions needed in order to use the password.\"}";
+        
+        var httpResponse = new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.NotFound,
-            Content = new StringContent($"{{\"ErrorCode\":\"APPAP004E\",\"ErrorMsg\":\"Password object matching query [Safe=partner;Folder=Root\\\\Secrets;Object=objectdoesnotexist] was not found (Diagnostic Info: 5). Please check that there is a password object that answers your query in the Vault and that both the Provider and the application user have the appropriate permissions needed in order to use the password.\"}}")
+            Content = new StringContent(errorResponse)
         };
         
         _mockConjurHttpClient
-            .Setup(p => p.GetPassword(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>()))
+            .Setup(p => p.GetPassword(
+                It.IsAny<string>(), 
+                It.IsAny<string>(), 
+                It.IsAny<string>(), 
+                It.IsAny<string>(),
+                It.IsAny<string>(), 
+                It.IsAny<string>()))
             .Returns(httpResponse);
 
         // Act
-        var exception = Assert.Throws<HttpClientException>(() => _sut.GetPassword(instanceParams, initializationInfo));
+        var exception = Assert.Throws<HttpClientException>(() => 
+            _sut.GetPassword(instanceParams, initializationInfo));
         
         // Assert
-        Assert.Equal("Failed to retrieve secret from CyberArk Central Credential Provider. Status Code: 404 (NotFound). Response message: {\"ErrorCode\":\"APPAP004E\",\"ErrorMsg\":\"Password object matching query [Safe=partner;Folder=Root\\\\Secrets;Object=objectdoesnotexist] was not found (Diagnostic Info: 5). Please check that there is a password object that answers your query in the Vault and that both the Provider and the application user have the appropriate permissions needed in order to use the password.\"}", exception.Message);
+        Assert.Equal($"Failed to retrieve secret from CyberArk Central Credential Provider. Status Code: 404 (NotFound). Response message: {errorResponse}", exception.Message);
     }
 }

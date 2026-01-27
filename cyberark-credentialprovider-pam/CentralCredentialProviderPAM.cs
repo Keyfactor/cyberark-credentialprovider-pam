@@ -1,4 +1,4 @@
-﻿// Copyright 2023 Keyfactor
+﻿// Copyright 2026 Keyfactor
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ namespace Keyfactor.Extensions.Pam.CyberArk
             if (!host.StartsWith("http"))
             {
                 _logger.LogTrace($"Host '{host}' does not include scheme. Prepending 'https://'.");
-                baseAddress = $"https://{host}";
+                baseAddress = $"https://{host}/";
             }
             
             var response = _httpClient.GetPassword(baseAddress, site, appId, safe, folder, obj);
