@@ -166,6 +166,7 @@ public class CentralCredentialProviderPAMTests
     [Theory]
     [InlineData("https://test.example.com:1234/")]
     [InlineData("http://test.example.com:1234/")]
+    [InlineData("http://test.example.com:1234")]
     public void GetPassword_HostIncludesScheme_KeepsProvidedScheme(string host)
     {
         // Arrange
