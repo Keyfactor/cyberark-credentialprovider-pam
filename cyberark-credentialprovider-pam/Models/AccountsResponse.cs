@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Keyfactor.Extensions.Pam.CyberArk
+namespace Keyfactor.Extensions.Pam.CyberArk.Models
 {
     public class AccountsResponse
     {

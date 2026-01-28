@@ -14,6 +14,8 @@
 
 using System.Net.Http;
 using System.Threading.Tasks;
+using Keyfactor.Extensions.Pam.CyberArk.Exceptions;
+using Keyfactor.Extensions.Pam.CyberArk.Models;
 using Keyfactor.Logging;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;

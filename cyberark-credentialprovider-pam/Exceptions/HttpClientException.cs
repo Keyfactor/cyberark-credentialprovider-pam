@@ -16,7 +16,7 @@ using System;
 using System.Net;
 using System.Runtime.Serialization;
 
-namespace Keyfactor.Extensions.Pam.CyberArk
+namespace Keyfactor.Extensions.Pam.CyberArk.Exceptions
 {
     [Serializable]
     public class HttpClientException : Exception

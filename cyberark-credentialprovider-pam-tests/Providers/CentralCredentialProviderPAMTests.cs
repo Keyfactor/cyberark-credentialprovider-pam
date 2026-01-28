@@ -16,6 +16,7 @@ using System.Net;
 using cyberark_credentialprovider_pam_tests.Fakes;
 using Keyfactor.Extensions.Pam.CyberArk;
 using Keyfactor.Extensions.Pam.CyberArk.Clients;
+using Keyfactor.Extensions.Pam.CyberArk.Exceptions;
 using MartinCostello.Logging.XUnit;
 using Microsoft.Extensions.Logging;
 using Moq;
