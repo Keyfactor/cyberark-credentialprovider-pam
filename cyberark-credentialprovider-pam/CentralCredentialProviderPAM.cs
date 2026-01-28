@@ -14,7 +14,6 @@
 
 using Keyfactor.Platform.Extensions;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using Keyfactor.Extensions.Pam.CyberArk.Clients;
@@ -26,17 +25,17 @@ namespace Keyfactor.Extensions.Pam.CyberArk
     public class CentralCredentialProviderPAM : CyberArkProvider, IPAMProvider
     {
         private readonly ILogger _logger;
-        private readonly IConjurHttpClient _httpClient;
+        private readonly CyberArkVaultHttpClient _httpClient;
 
         // Default constructor used by agent services
         public CentralCredentialProviderPAM()
         {
             _logger = LogHandler.GetClassLogger<CentralCredentialProviderPAM>();
-            _httpClient = new ConjurHttpClient(_logger);
+            _httpClient = new CyberArkVaultHttpClient(_logger);
         }
 
         // Constructor used by unit tests
-        public CentralCredentialProviderPAM(ILogger logger, IConjurHttpClient httpClient)
+        public CentralCredentialProviderPAM(ILogger logger, CyberArkVaultHttpClient httpClient)
         {
             _logger = logger;
             _httpClient = httpClient;
@@ -64,47 +63,15 @@ namespace Keyfactor.Extensions.Pam.CyberArk
             
             _logger.LogDebug("Retrieved required instance parameters:");
             _logger.LogDebug($"Safe: {safe}, Folder: {folder}, Object: {obj}");
-
-            var baseAddress = host;
-            if (!host.StartsWith("http"))
-            {
-                _logger.LogTrace($"Host '{host}' does not include scheme. Prepending 'https://'.");
-                baseAddress = $"https://{host}/";
-            }
             
-            var response = _httpClient.GetPassword(baseAddress, site, appId, safe, folder, obj);
-            
-            string json = ReadHttpResponse(response);
-            var account = JsonConvert.DeserializeObject<AccountsResponse>(json);
-            
-            _logger.LogInformation($"Successfully retrieved secret for object '{obj}' from safe '{safe}'.");
-            
-            _logger.MethodExit();
-
-            return account.Content;
-        }
-
-        private string ReadHttpResponse(HttpResponseMessage response)
-        {
-            _logger.MethodEntry();
-            
-            _logger.LogDebug("Reading HTTP response from CyberArk Central Credential Provider...");
-
-            string responseMessage = response.Content.ReadAsStringAsync()
+            string password = _httpClient.GetPassword(host, site, appId, safe, folder, obj)
                 .GetAwaiter()
                 .GetResult();
             
-            _logger.LogDebug($"Request returned status code: {(int)response.StatusCode} {response.StatusCode}");
+            _logger.LogInformation($"Successfully retrieved secret for object '{obj}' from safe '{safe}'.");
+            _logger.MethodExit();
             
-            if (response.IsSuccessStatusCode)
-            {
-                _logger.LogDebug("Successfully retrieved secret from CyberArk Central Credential Provider.");
-                
-                _logger.MethodExit();
-                return responseMessage;
-            }
-            
-            throw new HttpClientException(responseMessage, response.StatusCode);
+            return password;
         }
     }
 }

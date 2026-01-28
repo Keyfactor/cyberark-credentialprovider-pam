@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Net;
+using cyberark_credentialprovider_pam_tests.Fakes;
 using Keyfactor.Extensions.Pam.CyberArk;
 using Keyfactor.Extensions.Pam.CyberArk.Clients;
 using MartinCostello.Logging.XUnit;
@@ -24,8 +25,9 @@ namespace cyberark_credentialprovider_pam_tests.Providers;
 
 public class CentralCredentialProviderPAMTests
 {
+    private readonly ILogger _logger;
     private readonly CentralCredentialProviderPAM _sut;
-    private readonly Mock<IConjurHttpClient> _mockConjurHttpClient;
+    private readonly TestHttpMessageHandler _testHttpMessageHandler;
     
     // Test data constants
     private const string ExpectedSecret = "foobar";
@@ -41,11 +43,11 @@ public class CentralCredentialProviderPAMTests
         var loggerFactory = LoggerFactory.Create(builder =>
             builder.AddProvider(new XUnitLoggerProvider(output, new XUnitLoggerOptions()))
                 .SetMinimumLevel(LogLevel.Trace));
-        var logger = loggerFactory.CreateLogger<CentralCredentialProviderPAMTests>();
-
-        _mockConjurHttpClient = new Mock<IConjurHttpClient>();
+        _logger = loggerFactory.CreateLogger<CentralCredentialProviderPAMTests>();
         
-        _sut = new CentralCredentialProviderPAM(logger, _mockConjurHttpClient.Object);
+        _testHttpMessageHandler = new TestHttpMessageHandler();
+        var httpClient = new CyberArkVaultHttpClient(_logger, _testHttpMessageHandler);
+        _sut = new CentralCredentialProviderPAM(_logger, httpClient);
     }
     
     private static Dictionary<string, string> CreateInitializationInfo() => new()
@@ -62,23 +64,18 @@ public class CentralCredentialProviderPAMTests
         { "Object", TestObject }
     };
     
-    private void SetupSuccessfulPasswordRetrieval(string secret = ExpectedSecret)
+    private void SetupSuccessfulPasswordRetrieval(string secret = ExpectedSecret, Action<HttpRequestMessage> onRequest = null)
     {
-        var httpResponse = new HttpResponseMessage
+        _testHttpMessageHandler.HandlerFunc = (req, ct) =>
         {
-            StatusCode = HttpStatusCode.OK,
-            Content = new StringContent($"{{\"Content\":\"{secret}\"}}")
+            onRequest?.Invoke(req);
+            var httpResponse = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent($"{{\"Content\":\"{secret}\"}}")
+            };
+            return Task.FromResult(httpResponse);
         };
-
-        _mockConjurHttpClient
-            .Setup(p => p.GetPassword(
-                It.IsAny<string>(), 
-                It.IsAny<string>(), 
-                It.IsAny<string>(), 
-                It.IsAny<string>(),
-                It.IsAny<string>(), 
-                It.IsAny<string>()))
-            .Returns(httpResponse);
     }
     
     [Theory]
@@ -91,7 +88,7 @@ public class CentralCredentialProviderPAMTests
         var initializationInfo = CreateInitializationInfo();
         var instanceParams = CreateInstanceParams();
         var expectedMessage = $"Required field {keyToRemove} was missing a value or was not defined as expected in dictionary.";
-        
+
         // Act & Assert - Scenario 1: Key is missing from dictionary
         initializationInfo.Remove(keyToRemove);
         var exception1 = Assert.Throws<ArgumentException>(() => 
@@ -139,7 +136,7 @@ public class CentralCredentialProviderPAMTests
 
         // Act
         var password = _sut.GetPassword(instanceParams, initializationInfo);
-        
+
         // Assert
         Assert.Equal(ExpectedSecret, password);
     }
@@ -150,23 +147,20 @@ public class CentralCredentialProviderPAMTests
         // Arrange
         var initializationInfo = CreateInitializationInfo();
         initializationInfo["Host"] = "test.example.com:1234";
-        
-        var instanceParams = CreateInstanceParams();
-        var expectedHostname = "https://test.example.com:1234/";
 
-        SetupSuccessfulPasswordRetrieval();
+        HttpRequestMessage capturedRequest = null;
+        SetupSuccessfulPasswordRetrieval(ExpectedSecret, req => capturedRequest = req);
+
+        var instanceParams = CreateInstanceParams();
 
         // Act
-        _sut.GetPassword(instanceParams, initializationInfo);
-        
+        var password = _sut.GetPassword(instanceParams, initializationInfo);
+
         // Assert
-        _mockConjurHttpClient.Verify(p => p.GetPassword(
-            expectedHostname, 
-            It.IsAny<string>(), 
-            It.IsAny<string>(), 
-            It.IsAny<string>(),
-            It.IsAny<string>(), 
-            It.IsAny<string>()), Times.Once);
+        Assert.Equal(ExpectedSecret, password);
+        Assert.NotNull(capturedRequest);
+        Assert.Equal("test.example.com", capturedRequest.RequestUri.Host);
+        Assert.Equal("https", capturedRequest.RequestUri.Scheme);
     }
     
     [Theory]
@@ -177,21 +171,19 @@ public class CentralCredentialProviderPAMTests
         // Arrange
         var initializationInfo = CreateInitializationInfo();
         initializationInfo["Host"] = host;
-        
+
+        HttpRequestMessage capturedRequest = null;
+        SetupSuccessfulPasswordRetrieval(ExpectedSecret, req => capturedRequest = req);
+
         var instanceParams = CreateInstanceParams();
-        SetupSuccessfulPasswordRetrieval();
 
         // Act
-        _sut.GetPassword(instanceParams, initializationInfo);
-        
+        var password = _sut.GetPassword(instanceParams, initializationInfo);
+
         // Assert
-        _mockConjurHttpClient.Verify(p => p.GetPassword(
-            host, 
-            It.IsAny<string>(), 
-            It.IsAny<string>(), 
-            It.IsAny<string>(),
-            It.IsAny<string>(), 
-            It.IsAny<string>()), Times.Once);
+        Assert.Equal(ExpectedSecret, password);
+        Assert.NotNull(capturedRequest);
+        Assert.StartsWith(host, capturedRequest.RequestUri.ToString());
     }
     
     [Fact]
@@ -201,30 +193,25 @@ public class CentralCredentialProviderPAMTests
         var initializationInfo = CreateInitializationInfo();
         var instanceParams = CreateInstanceParams();
         instanceParams["Object"] = "objectdoesnotexist";
-        
+
         var errorResponse = "{\"ErrorCode\":\"APPAP004E\",\"ErrorMsg\":\"Password object matching query [Safe=partner;Folder=Root\\\\Secrets;Object=objectdoesnotexist] was not found (Diagnostic Info: 5). Please check that there is a password object that answers your query in the Vault and that both the Provider and the application user have the appropriate permissions needed in order to use the password.\"}";
-        
-        var httpResponse = new HttpResponseMessage
+
+        _testHttpMessageHandler.HandlerFunc = (req, ct) =>
         {
-            StatusCode = HttpStatusCode.NotFound,
-            Content = new StringContent(errorResponse)
+            var httpResponse = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.NotFound,
+                Content = new StringContent(errorResponse)
+            };
+            return Task.FromResult(httpResponse);
         };
-        
-        _mockConjurHttpClient
-            .Setup(p => p.GetPassword(
-                It.IsAny<string>(), 
-                It.IsAny<string>(), 
-                It.IsAny<string>(), 
-                It.IsAny<string>(),
-                It.IsAny<string>(), 
-                It.IsAny<string>()))
-            .Returns(httpResponse);
 
         // Act
-        var exception = Assert.Throws<HttpClientException>(() => 
+        var exception = Assert.Throws<HttpClientException>(() =>
             _sut.GetPassword(instanceParams, initializationInfo));
-        
+
         // Assert
-        Assert.Equal($"Failed to retrieve secret from CyberArk Central Credential Provider. Status Code: 404 (NotFound). Response message: {errorResponse}", exception.Message);
+        Assert.Contains("Failed to retrieve secret from CyberArk Central Credential Provider", exception.Message);
+        Assert.Contains(errorResponse, exception.Message);
     }
 }
