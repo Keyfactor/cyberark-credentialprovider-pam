@@ -18,9 +18,9 @@ namespace cyberark_credentialprovider_pam_tests.Fakes;
 
 public class TestHttpMessageHandler : HttpMessageHandler
 {
-    public Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> HandlerFunc { get; set; }
+    public Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>>? HandlerFunc { get; set; }
 
-    public TestHttpMessageHandler(Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> handlerFunc = null)
+    public TestHttpMessageHandler(Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>>? handlerFunc = null)
     {
         HandlerFunc = handlerFunc;
     }

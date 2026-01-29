@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Keyfactor.Platform.Extensions;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -54,24 +55,35 @@ namespace Keyfactor.Extensions.Pam.CyberArk
             string host = GetRequiredValue(initializationInfo, "Host");
             string site = GetRequiredValue(initializationInfo, "Site");
             
-            _logger.LogTrace("Retrieved required initialization parameters:");
-            _logger.LogTrace($"App ID: {appId}, Host: {host}, Site: {site}");
+            _logger.LogDebug("Configured with Initialization Parameters:\n" + 
+                                   $"App ID: {appId}, Host: {host}, Site: {site}");
 
             string safe = GetRequiredValue(instanceParameters, "Safe");
             string folder = GetRequiredValue(instanceParameters, "Folder");
             string obj = GetRequiredValue(instanceParameters, "Object");
             
-            _logger.LogDebug("Retrieved required instance parameters:");
-            _logger.LogDebug($"Safe: {safe}, Folder: {folder}, Object: {obj}");
+            _logger.LogDebug("Configured with Instance Parameters:\n" + 
+                             $"Safe: {safe}, Folder: {folder}, Object: {obj}");
+
+            try
+            {
+                string password = _httpClient.GetPassword(host, site, appId, safe, folder, obj)
+                    .GetAwaiter()
+                    .GetResult();
+
+                _logger.LogInformation(
+                    $"Successfully retrieved secret for object '{obj}' from safe '{safe}' (AppID: {appId}).");
+                _logger.MethodExit();
+
+                return password;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving secret for object '{obj}' from safe '{safe}' (AppID: {appId}): {ex.Message}");
+
+                throw;
+            }
             
-            string password = _httpClient.GetPassword(host, site, appId, safe, folder, obj)
-                .GetAwaiter()
-                .GetResult();
-            
-            _logger.LogInformation($"Successfully retrieved secret for object '{obj}' from safe '{safe}'.");
-            _logger.MethodExit();
-            
-            return password;
         }
     }
 }

@@ -24,48 +24,38 @@ using Xunit.Abstractions;
 
 namespace cyberark_credentialprovider_pam_tests.Providers;
 
-public class CentralCredentialProviderPAMTests
+public class CentralCredentialProviderPAMTests : BaseCredentialProviderPAMTest
 {
-    private readonly ILogger _logger;
     private readonly CentralCredentialProviderPAM _sut;
     private readonly TestHttpMessageHandler _testHttpMessageHandler;
-    
-    // Test data constants
-    private const string ExpectedSecret = "foobar";
-    private const string TestAppId = "TestAppId";
-    private const string TestHost = "TestHost";
-    private const string TestSite = "TestSite";
-    private const string TestSafe = "TestSafe";
-    private const string TestFolder = "TestFolder";
-    private const string TestObject = "TestObject";
     
     public CentralCredentialProviderPAMTests(ITestOutputHelper output)
     {
         var loggerFactory = LoggerFactory.Create(builder =>
             builder.AddProvider(new XUnitLoggerProvider(output, new XUnitLoggerOptions()))
                 .SetMinimumLevel(LogLevel.Trace));
-        _logger = loggerFactory.CreateLogger<CentralCredentialProviderPAMTests>();
+        var logger = loggerFactory.CreateLogger<CentralCredentialProviderPAMTests>();
         
         _testHttpMessageHandler = new TestHttpMessageHandler();
-        var httpClient = new CyberArkVaultHttpClient(_logger, _testHttpMessageHandler);
-        _sut = new CentralCredentialProviderPAM(_logger, httpClient);
+        var httpClient = new CyberArkVaultHttpClient(logger, _testHttpMessageHandler);
+        _sut = new CentralCredentialProviderPAM(logger, httpClient);
     }
     
-    private static Dictionary<string, string> CreateInitializationInfo() => new()
+    protected override Dictionary<string, string> CreateInitializationInfo() => new()
     {
         { "AppId", TestAppId },
         { "Host", TestHost },
         { "Site", TestSite }
     };
 
-    private static Dictionary<string, string> CreateInstanceParams() => new()
+    protected override Dictionary<string, string> CreateInstanceParams() => new()
     {
         { "Safe", TestSafe },
         { "Folder", TestFolder },
         { "Object", TestObject }
     };
     
-    private void SetupSuccessfulPasswordRetrieval(string secret = ExpectedSecret, Action<HttpRequestMessage> onRequest = null)
+    private void SetupSuccessfulPasswordRetrieval(string secret = ExpectedSecret, Action<HttpRequestMessage>? onRequest = null)
     {
         _testHttpMessageHandler.HandlerFunc = (req, ct) =>
         {
@@ -149,7 +139,7 @@ public class CentralCredentialProviderPAMTests
         var initializationInfo = CreateInitializationInfo();
         initializationInfo["Host"] = "test.example.com:1234";
 
-        HttpRequestMessage capturedRequest = null;
+        HttpRequestMessage? capturedRequest = null;
         SetupSuccessfulPasswordRetrieval(ExpectedSecret, req => capturedRequest = req);
 
         var instanceParams = CreateInstanceParams();
@@ -160,7 +150,7 @@ public class CentralCredentialProviderPAMTests
         // Assert
         Assert.Equal(ExpectedSecret, password);
         Assert.NotNull(capturedRequest);
-        Assert.Equal("test.example.com", capturedRequest.RequestUri.Host);
+        Assert.Equal("test.example.com", capturedRequest.RequestUri!.Host);
         Assert.Equal("https", capturedRequest.RequestUri.Scheme);
     }
     
@@ -174,7 +164,7 @@ public class CentralCredentialProviderPAMTests
         var initializationInfo = CreateInitializationInfo();
         initializationInfo["Host"] = host;
 
-        HttpRequestMessage capturedRequest = null;
+        HttpRequestMessage? capturedRequest = null;
         SetupSuccessfulPasswordRetrieval(ExpectedSecret, req => capturedRequest = req);
 
         var instanceParams = CreateInstanceParams();
@@ -185,7 +175,7 @@ public class CentralCredentialProviderPAMTests
         // Assert
         Assert.Equal(ExpectedSecret, password);
         Assert.NotNull(capturedRequest);
-        Assert.StartsWith(host, capturedRequest.RequestUri.ToString());
+        Assert.StartsWith(host, capturedRequest.RequestUri!.ToString());
     }
     
     [Fact]

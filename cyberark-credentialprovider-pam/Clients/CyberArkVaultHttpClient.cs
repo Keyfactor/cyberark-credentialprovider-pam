@@ -41,8 +41,13 @@ namespace Keyfactor.Extensions.Pam.CyberArk.Clients
             var baseAddress = host;
             if (!host.StartsWith("http"))
             {
-                _logger.LogTrace($"Host '{host}' does not include scheme. Prepending 'https://'.");
+                _logger.LogDebug($"Host '{host}' does not include scheme. Prepending 'https://'.");
                 baseAddress = $"https://{host}/";
+            }
+
+            if (baseAddress.StartsWith("http://"))
+            {
+                _logger.LogWarning($"Using unsecure HTTP to connect to CyberArk Central Credential Provider at '{baseAddress}'. It is recommended to use HTTPS instead.");
             }
 
             using (var http = new HttpClient(_httpMessageHandler, false))
@@ -52,7 +57,7 @@ namespace Keyfactor.Extensions.Pam.CyberArk.Clients
                 
                 var path = $"{site}/api/Accounts?AppID={appId}&Safe={safe};Folder={folder};Object={obj}";
                 
-                _logger.LogDebug($"Fetching secret from path: {path}");
+                _logger.LogDebug($"Fetching secret from URL: {baseAddress}/{path}");
                 var response = await http.GetAsync(path);
                 
                 _logger.LogDebug($"Request returned status code: {(int)response.StatusCode} {response.StatusCode}");
@@ -60,14 +65,14 @@ namespace Keyfactor.Extensions.Pam.CyberArk.Clients
                 
                 if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogDebug("Successfully retrieved secret from CyberArk Central Credential Provider.");
+                    _logger.LogDebug("Successfully retrieved secret from CyberArk Central Credential Provider HTTP API.");
                     _logger.MethodExit();
                     
                     var result = JsonConvert.DeserializeObject<AccountsResponse>(responseMessage);
                     return result.Content;
                 }
                 
-                _logger.LogCritical($"Failed to retrieve secret from CyberArk Central Credential Provider: {responseMessage}");
+                _logger.LogCritical($"Failed to retrieve secret from CyberArk Central Credential Provider HTTP API: {responseMessage}");
                 throw new HttpClientException(responseMessage, response.StatusCode);
             }
         }
