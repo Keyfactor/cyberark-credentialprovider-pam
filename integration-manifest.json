@@ -1,12 +1,13 @@
 {
-  "$schema": "https://keyfactor.github.io/integration-manifest-schema.json",
+  "$schema": "https://keyfactor.github.io/v2/integration-manifest-schema.json",
   "integration_type": "pam",
   "name": "CyberArk PAM Provider",
   "status": "production",
   "support_level": "kf-supported",
   "link_github": false,
   "update_catalog": true,
-  "release_dir": "cyberark-credentialprovider-pam/bin/Release/netstandard2.0",
+  "release_project": "cyberark-credentialprovider-pam/cyberark-credentialprovider-pam.csproj",
+  "release_dir": "cyberark-credentialprovider-pam/bin/Release",
   "description": "A Keyfactor PAM Provider plugin supporting credential retrieval with a CyberArk Credential Provider. The Central Credential Provider (cloud-hosted) can be used, or the standard Credential Provider with installed SDK.",
   "about": {
     "pam": {
@@ -22,37 +23,43 @@
               "Name": "AppId",
               "DisplayName": "Application ID",
               "DataType": 1,
-              "InstanceLevel": false
+              "InstanceLevel": false,
+              "Description": "The Application ID with access set up for the Safe used to identify and authenticate requests."
             },
             {
               "Name": "Host",
               "DisplayName": "CyberArk Host and Port",
               "DataType": 1,
-              "InstanceLevel": false
+              "InstanceLevel": false,
+              "Description": "The hostname (IP address or domain name) and (optionally) port. It should take the format: my.cyberark.instance:404 (note: no https:// included)."
             },
             {
               "Name": "Site",
               "DisplayName": "CyberArk API Site",
               "DataType": 1,
-              "InstanceLevel": false
+              "InstanceLevel": false,
+              "Description": "By default, AIMWebService is the site name, but may be deployed to another site name."
             },
             {
               "Name": "Safe",
               "DisplayName": "Safe",
               "DataType": 1,
-              "InstanceLevel": true
+              "InstanceLevel": true,
+              "Description": "The name of the Safe the credential resides in."
             },
             {
               "Name": "Folder",
               "DisplayName": "Folder",
               "DataType": 1,
-              "InstanceLevel": true
+              "InstanceLevel": true,
+              "Description": "The folder path the credential lives in. If it is nested, use the backwards slash e.g. Root\\Folder"
             },
             {
               "Name": "Object",
               "DisplayName": "Object",
               "DataType": 1,
-              "InstanceLevel": true
+              "InstanceLevel": true,
+              "Description": "The name of the password object that has the credential."
             }
           ]
         },
@@ -63,25 +70,29 @@
               "Name": "AppId",
               "DisplayName": "Application ID",
               "DataType": 1,
-              "InstanceLevel": false
+              "InstanceLevel": false,
+              "Description": "The Application ID with access set up for the Safe used to identify and authenticate requests."
             },
             {
               "Name": "Safe",
               "DisplayName": "Safe",
               "DataType": 1,
-              "InstanceLevel": true
+              "InstanceLevel": true,
+              "Description": "The name of the Safe the credential resides in."
             },
             {
               "Name": "Folder",
               "DisplayName": "Folder",
               "DataType": 1,
-              "InstanceLevel": true
+              "InstanceLevel": true,
+              "Description": "The folder path the credential lives in. If it is nested, use the backwards slash e.g. Root\\Folder"
             },
             {
               "Name": "Object",
               "DisplayName": "Object",
               "DataType": 1,
-              "InstanceLevel": true
+              "InstanceLevel": true,
+              "Description": "The name of the password object that has the credential."
             }
           ]
         }
