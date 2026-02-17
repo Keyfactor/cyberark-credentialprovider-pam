@@ -63,8 +63,9 @@ Before proceeding with installation, you should consider which pattern is best f
 
 To install CyberArk PAM Provider, it is recommended you install [kfutil](https://github.com/Keyfactor/kfutil). `kfutil` is a command-line tool that simplifies the process of creating PAM Types in Keyfactor Command.
 
-The CyberArk PAM Provider implements 2 PAM Types. Depending on your use case, you may elect to install one, or all of these PAM Types. An overview for each type is linked below:
+The CyberArk PAM Provider implements 3 PAM Types. Depending on your use case, you may elect to install one, or all of these PAM Types. An overview for each type is linked below:
 * [CyberArk-CentralCredentialProvider](docs/cyberark-centralcredentialprovider.md)
+* [CyberArk-ClientAuth-CentralCredentialProvider](docs/cyberark-clientauth-centralcredentialprovider.md)
 * [CyberArk-SdkCredentialProvider](docs/cyberark-sdkcredentialprovider.md)
 
 
@@ -238,6 +239,112 @@ Below is the payload to `POST` to the Keyfactor Command API
 3. Restart the Universal Orchestrator service.
 
 
+
+
+
+</details>
+
+
+
+
+
+
+
+<details><summary>CyberArk-ClientAuth-CentralCredentialProvider</summary>
+
+
+#### Requirements
+   TODO Requirements is a required section
+
+#### Create PAM type in Keyfactor Command
+
+
+##### Using `kfutil`
+Create the required PAM Types in the connected Command platform.
+
+```shell
+# CyberArk-ClientAuth-CentralCredentialProvider
+kfutil pam types-create -r cyberark-credentialprovider-pam -n CyberArk-ClientAuth-CentralCredentialProvider
+```
+
+##### Using the API
+For full API docs please visit our [product documentation](https://software.keyfactor.com/Core-OnPrem/Current/Content/WebAPI/KeyfactorAPI/PAMProvidersPOSTTypes.htm?Highlight=pam%20type)
+
+Below is the payload to `POST` to the Keyfactor Command API
+```json
+{
+    "Name": "CyberArk-ClientAuth-CentralCredentialProvider",
+    "Parameters": [
+        {
+            "Name": "AppId",
+            "DisplayName": "Application ID",
+            "DataType": 1,
+            "InstanceLevel": false,
+            "Description": "The Application ID with access set up for the Safe used to identify and authenticate requests."
+        },
+        {
+            "Name": "Host",
+            "DisplayName": "CyberArk Host and Port",
+            "DataType": 1,
+            "InstanceLevel": false,
+            "Description": "The hostname (IP address or domain name) and (optionally) port. It should take the format: my.cyberark.instance:404 (note: no https:// included)."
+        },
+        {
+            "Name": "Site",
+            "DisplayName": "CyberArk API Site",
+            "DataType": 1,
+            "InstanceLevel": false,
+            "Description": "By default, AIMWebService is the site name, but may be deployed to another site name."
+        },
+        {
+            "Name": "PfxBase64",
+            "DisplayName": "PFX Base64",
+            "DataType": 1,
+            "InstanceLevel": false,
+            "Description": "The Base64-encoded PFX certificate used for authentication."
+        },
+        {
+            "Name": "PfxPassword",
+            "DisplayName": "PFX Password",
+            "DataType": 2,
+            "InstanceLevel": false,
+            "Description": "The password for the PFX certificate used for authentication."
+        },
+        {
+            "Name": "Safe",
+            "DisplayName": "Safe",
+            "DataType": 1,
+            "InstanceLevel": true,
+            "Description": "The name of the Safe the credential resides in."
+        },
+        {
+            "Name": "Folder",
+            "DisplayName": "Folder",
+            "DataType": 1,
+            "InstanceLevel": true,
+            "Description": "The folder path the credential lives in. If it is nested, use the backwards slash e.g. Root\\Folder"
+        },
+        {
+            "Name": "Object",
+            "DisplayName": "Object",
+            "DataType": 1,
+            "InstanceLevel": true,
+            "Description": "The name of the password object that has the credential."
+        }
+    ]
+}
+```
+
+#### Install PAM provider on Keyfactor Command Host (Local)
+
+
+("TODO Platform Install is an optional section. If this section doesn't seem necessary on initial glance, please delete it. Refer to the docs on [Confluence](https://keyfactor.atlassian.net/wiki/x/SAAyHg) for more info",)
+
+
+#### Install PAM provider on a Universal Orchestrator Host (Remote)
+
+
+("TODO Orchestrator Install is an optional section. If this section doesn't seem necessary on initial glance, please delete it. Refer to the docs on [Confluence](https://keyfactor.atlassian.net/wiki/x/SAAyHg) for more info",)
 
 
 
@@ -543,6 +650,32 @@ When entering Secret fields, select the **Load From Keyfactor Secrets** tab, and
 
 > [!NOTE]
 > Additional information on CyberArk-CentralCredentialProvider can be found in the [supplemental documentation](docs/cyberark-centralcredentialprovider.md).
+
+
+
+
+
+<details><summary>CyberArk-ClientAuth-CentralCredentialProvider</summary>
+
+
+#### From Keyfactor Command Host (Local)
+
+
+("TODO Platform Usage is an optional section. If this section doesn't seem necessary on initial glance, please delete it. Refer to the docs on [Confluence](https://keyfactor.atlassian.net/wiki/x/SAAyHg) for more info",)
+
+
+#### From a Universal Orchestrator Host (Remote)
+
+
+("TODO Orchestrator Usage is an optional section. If this section doesn't seem necessary on initial glance, please delete it. Refer to the docs on [Confluence](https://keyfactor.atlassian.net/wiki/x/SAAyHg) for more info",)
+
+
+
+</details>
+
+
+> [!NOTE]
+> Additional information on CyberArk-ClientAuth-CentralCredentialProvider can be found in the [supplemental documentation](docs/cyberark-clientauth-centralcredentialprovider.md).
 
 
 
