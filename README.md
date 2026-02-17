@@ -76,7 +76,7 @@ The CyberArk PAM Provider implements 2 PAM Types. Depending on your use case, yo
 
 
 #### Requirements
-   In order for the Central Credential Provider to work, the Safe / Secret being accessed need to be available to the Provider that the Cyber Ark server is using, and the Application ID needs to be usable from an external requestor.This may require adding IP address or other rules.
+   In order for the Central Credential Provider to work, the Safe / Secret being accessed need to be available to the Provider that the Cyber Ark server is using, and the Application ID needs to be usable from an external requestor. This may require adding IP address or other rules.
 
    Certificate Authentication is not currently supported and needs to be disabled. This may necessitate creating a Site that allows HTTPS requests but does not require a Client Certificate to authenticate. By default the site `AIMWebService` may require a Client Certificate, which would need to be edited or have another site created.
 
@@ -253,11 +253,33 @@ Below is the payload to `POST` to the Keyfactor Command API
 
 
 #### Requirements
-   To use a local Credential Provider instead, the Credential Provider will need to be installed on the machine that is using the PAM Provider. After installing the Credential Provider, copy the `NetStandardPasswordSDK.dll` assembly from the install location into the PAM Provider install location. This dll should be adjacent to `cyberark-credentialprovider-pam.dll` to be properly loaded.
+   After installing the Credential Provider, copy the `NetStandardPasswordSDK.dll` assembly from the install location into the PAM Provider install location. This dll should be stored in the same directory as `cyberark-credentialprovider-pam.dll` to be properly loaded. The name `NetStandardPasswordSDK.dll` is case-sensitive, so make sure the name is copied to the directory as `NetStandardPasswordSDK.dll`.
 
    After registering the Credential Provider during install, make sure the Provider for the machine has been granted permission to access the Safe, as well as the Application ID that will be used.
 
+   To read secrets stored in a CyberArk Vault safe, the Partner must have at least the following permissions on the safe:
+   - Monitor Safe
+   - Retrieve files from Safe
+
    The default <code>manifest.json</code> needs to be replaced with the included <code>SDK-manifest.json</code>. Rename the existing <code>manifest.json</code> as <code>Central-manifest.json</code> and then rename the <code>SDK-manifest.json</code> to replace the original <code>manifest.json</code>.
+
+   ### IMPORTANT NOTE FOR LINUX INSTALLATIONS
+
+   If you have installed the Credential Provider on a Linux instance and run this PAM extension within a [Universal Orchestrator as a Linux service](https://software.keyfactor.com/Core-OnPrem/Current/Content/InstallingAgents/NetCoreOrchestrator/InstalltheOrchestratorLinux.htm), you may run into issues communicating with the Credential Provider service and receive an `ENCPR019E` error code when the PAM instance tries to retrieve a credential. 
+
+   By default, the Universal Orchestrator Linux service has [PrivateTmp](https://www.redhat.com/en/blog/new-red-hat-enterprise-linux-7-security-feature-privatetmp) enabled, which creates a separate, isolated `/tmp` directory for the service. The CyberArk Credential Provider creates a named pipe in the `/tmp` directory to communicate with other applications, so when PrivateTmp is enabled, the PAM instance cannot access this pipe to communicate with the Credential Provider. To resolve this issue, you can disable PrivateTmp for the Universal Orchestrator Linux service by creating an override file with the command `sudo systemctl edit keyfactor-orchestrator-default.service` and adding the following lines:
+
+   ```
+   [Service]
+   PrivateTmp=false
+   ```
+
+   and then run the following commands to restart the service deemon and the Universal Orchestrator service:
+
+   ```bash
+   sudo systemctl daemon-reload
+   sudo systemctl restart keyfactor-orchestrator-default.service
+   ```
 
 #### Create PAM type in Keyfactor Command
 
