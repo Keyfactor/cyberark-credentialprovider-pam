@@ -63,6 +63,67 @@
             }
           ]
         },
+        "CyberArk-ClientAuth-CentralCredentialProvider": {
+          "Name": "CyberArk-ClientAuth-CentralCredentialProvider",
+          "Parameters": [
+            {
+              "Name": "AppId",
+              "DisplayName": "Application ID",
+              "DataType": 1,
+              "InstanceLevel": false,
+              "Description": "The Application ID with access set up for the Safe used to identify and authenticate requests."
+            },
+            {
+              "Name": "Host",
+              "DisplayName": "CyberArk Host and Port",
+              "DataType": 1,
+              "InstanceLevel": false,
+              "Description": "The hostname (IP address or domain name) and (optionally) port. It should take the format: my.cyberark.instance:404 (note: no https:// included)."
+            },
+            {
+              "Name": "Site",
+              "DisplayName": "CyberArk API Site",
+              "DataType": 1,
+              "InstanceLevel": false,
+              "Description": "By default, AIMWebService is the site name, but may be deployed to another site name."
+            },
+            {
+              "Name": "PfxBase64",
+              "DisplayName": "PFX Base64",
+              "DataType": 1,
+              "InstanceLevel": false,
+              "Description": "The Base64-encoded PFX certificate used for authentication."
+            },
+            {
+              "Name": "PfxPassword",
+              "DisplayName": "PFX Password",
+              "DataType": 2,
+              "InstanceLevel": false,
+              "Description": "The password for the PFX certificate used for authentication."
+            },
+            {
+              "Name": "Safe",
+              "DisplayName": "Safe",
+              "DataType": 1,
+              "InstanceLevel": true,
+              "Description": "The name of the Safe the credential resides in."
+            },
+            {
+              "Name": "Folder",
+              "DisplayName": "Folder",
+              "DataType": 1,
+              "InstanceLevel": true,
+              "Description": "The folder path the credential lives in. If it is nested, use the backwards slash e.g. Root\\Folder"
+            },
+            {
+              "Name": "Object",
+              "DisplayName": "Object",
+              "DataType": 1,
+              "InstanceLevel": true,
+              "Description": "The name of the password object that has the credential."
+            }
+          ]
+        },
         "CyberArk-SdkCredentialProvider": {
           "Name": "CyberArk-SdkCredentialProvider",
           "Parameters": [
