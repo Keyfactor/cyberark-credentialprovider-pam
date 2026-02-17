@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Net.Http;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Keyfactor.Extensions.Pam.CyberArk.Exceptions;
 using Keyfactor.Extensions.Pam.CyberArk.Models;
@@ -32,6 +34,28 @@ namespace Keyfactor.Extensions.Pam.CyberArk.Clients
         {
             _logger = logger;
             _httpMessageHandler = httpMessageHandler ?? new HttpClientHandler();
+        }
+
+        // Static factory method for client cert scenarios
+        public static CyberArkVaultHttpClient CreateWithClientCertificate(
+            ILogger logger, 
+            string base64Pfx, 
+            string pfxPassword,
+            HttpMessageHandler innerHandler = null)
+        {
+            logger.LogTrace("Creating CyberArkVaultHttpClient with client certificate authentication.");
+            
+            byte[] pfxBytes = Convert.FromBase64String(base64Pfx);
+            var clientCert = new X509Certificate2(
+                pfxBytes, 
+                pfxPassword,
+                X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet
+            );
+            
+            logger.LogTrace("Successfully loaded client certificate with subject '{Subject}' from provided PFX data.", clientCert.Subject);
+
+            var handler = new ClientCertificateHandler(logger, clientCert, innerHandler);
+            return new CyberArkVaultHttpClient(logger, handler);
         }
 
         public async Task<string> GetPassword(string host, string site, string appId, string safe, string folder, string obj)
@@ -76,5 +100,21 @@ namespace Keyfactor.Extensions.Pam.CyberArk.Clients
                 throw new HttpClientException(responseMessage, response.StatusCode);
             }
         }
+    }
+}
+
+public class ClientCertificateHandler : DelegatingHandler
+{
+    public ClientCertificateHandler(ILogger logger, X509Certificate2 clientCertificate, HttpMessageHandler innerHandler = null)
+        : base(innerHandler ?? new HttpClientHandler())
+    {
+        if (InnerHandler is HttpClientHandler httpClientHandler)
+        {
+            logger.LogInformation("Adding client certificate with subject '{Subject}' to HTTP client handler.", clientCertificate.Subject);
+            httpClientHandler.ClientCertificates.Add(clientCertificate);
+            return;
+        }
+        
+        logger.LogWarning("Inner handler is not an HttpClientHandler. Client certificate will not be added to HTTP requests.");
     }
 }
