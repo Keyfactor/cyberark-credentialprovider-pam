@@ -1,9 +1,9 @@
 {
   "extensions": {
     "Keyfactor.Platform.Extensions.IPAMProvider": {
-      "PAMProviders.CyberArk-CentralCredentialProvider.PAMProvider": {
+      "PAMProviders.CyberArk-ClientAuth-CentralCredentialProvider.PAMProvider": {
         "assemblyPath": "cyberark-credentialprovider-pam.dll",
-        "TypeFullName": "Keyfactor.Extensions.Pam.CyberArk.CentralCredentialProviderPAM"
+        "TypeFullName": "Keyfactor.Extensions.Pam.CyberArk.CentralCredentialProviderClientCertPAM"
       }
     }
   },

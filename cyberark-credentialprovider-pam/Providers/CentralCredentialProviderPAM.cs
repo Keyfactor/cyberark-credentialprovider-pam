@@ -23,67 +23,47 @@ using Microsoft.Extensions.Logging;
 
 namespace Keyfactor.Extensions.Pam.CyberArk
 {
-    public class CentralCredentialProviderPAM : CyberArkProvider, IPAMProvider
+    public class CentralCredentialProviderPAM : BaseCentralCredentialProviderPAM, IPAMProvider
     {
-        private readonly ILogger _logger;
-        private readonly CyberArkVaultHttpClient _httpClient;
 
         // Default constructor used by agent services
         public CentralCredentialProviderPAM()
         {
-            _logger = LogHandler.GetClassLogger<CentralCredentialProviderPAM>();
-            _httpClient = new CyberArkVaultHttpClient(_logger);
+            Logger = LogHandler.GetClassLogger<CentralCredentialProviderPAM>();
+            HttpClient = new CyberArkVaultHttpClient(Logger);
         }
 
         // Constructor used by unit tests
         public CentralCredentialProviderPAM(ILogger logger, CyberArkVaultHttpClient httpClient)
         {
-            _logger = logger;
-            _httpClient = httpClient;
+            Logger = logger;
+            HttpClient = httpClient;
         }
         
         public string Name => "CyberArk-CentralCredentialProvider";
 
         public string GetPassword(Dictionary<string, string> instanceParameters, Dictionary<string, string> initializationInfo)
         {
-            _logger.MethodEntry();
+            Logger.MethodEntry();
             
-            _logger.LogTrace("InitializationInfo: {}", JsonConvert.SerializeObject(initializationInfo));
-            _logger.LogTrace("InstanceParameters: {}", JsonConvert.SerializeObject(instanceParameters));
+            Logger.LogTrace("InitializationInfo: {}", JsonConvert.SerializeObject(initializationInfo));
+            Logger.LogTrace("InstanceParameters: {}", JsonConvert.SerializeObject(instanceParameters));
             
-            string appId = GetRequiredValue(initializationInfo, "AppId");
-            string host = GetRequiredValue(initializationInfo, "Host");
-            string site = GetRequiredValue(initializationInfo, "Site");
+            AppId = GetRequiredValue(initializationInfo, "AppId");
+            Host = GetRequiredValue(initializationInfo, "Host");
+            Site = GetRequiredValue(initializationInfo, "Site");
             
-            _logger.LogDebug("Configured with Initialization Parameters:\n" + 
-                                   $"App ID: {appId}, Host: {host}, Site: {site}");
+            Logger.LogDebug("Configured with Initialization Parameters:\n" + 
+                                   $"App ID: {AppId}, Host: {Host}, Site: {Site}");
 
-            string safe = GetRequiredValue(instanceParameters, "Safe");
-            string folder = GetRequiredValue(instanceParameters, "Folder");
-            string obj = GetRequiredValue(instanceParameters, "Object");
+            Safe = GetRequiredValue(instanceParameters, "Safe");
+            Folder = GetRequiredValue(instanceParameters, "Folder");
+            Object = GetRequiredValue(instanceParameters, "Object");
             
-            _logger.LogDebug("Configured with Instance Parameters:\n" + 
-                             $"Safe: {safe}, Folder: {folder}, Object: {obj}");
+            Logger.LogDebug("Configured with Instance Parameters:\n" + 
+                             $"Safe: {Safe}, Folder: {Folder}, Object: {Object}");
 
-            try
-            {
-                string password = _httpClient.GetPassword(host, site, appId, safe, folder, obj)
-                    .GetAwaiter()
-                    .GetResult();
-
-                _logger.LogInformation(
-                    $"Successfully retrieved secret for object '{obj}' from safe '{safe}' (AppID: {appId}).");
-                _logger.MethodExit();
-
-                return password;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error retrieving secret for object '{obj}' from safe '{safe}' (AppID: {appId}): {ex.Message}");
-
-                throw;
-            }
-            
+            return GetPasswordFromCyberArk();
         }
     }
 }

@@ -9,22 +9,22 @@ using Newtonsoft.Json;
 
 namespace Keyfactor.Extensions.Pam.CyberArk
 {
-    public class CentralCredentialProviderClientCertPAM : CyberArkProvider, IPAMProvider
+    public class CentralCredentialProviderClientCertPAM : BaseCentralCredentialProviderPAM, IPAMProvider
     {
-        private readonly ILogger _logger;
+        // private readonly ILogger _logger;
         private readonly HttpMessageHandler _handler;
         
         // Default constructor used by agent services
         public CentralCredentialProviderClientCertPAM()
         {
-            _logger = LogHandler.GetClassLogger<CentralCredentialProviderClientCertPAM>();
+            Logger = LogHandler.GetClassLogger<CentralCredentialProviderClientCertPAM>();
             _handler = null;
         }
         
         // Constructor used by unit tests
         public CentralCredentialProviderClientCertPAM(ILogger logger, HttpMessageHandler handler = null)
         {
-            _logger = logger;
+            Logger = logger;
             _handler = handler;
         }
         
@@ -32,47 +32,30 @@ namespace Keyfactor.Extensions.Pam.CyberArk
         
         public string GetPassword(Dictionary<string, string> instanceParameters, Dictionary<string, string> initializationInfo)
         {
-            _logger.MethodEntry();
+            Logger.MethodEntry();
             
-            _logger.LogTrace("InstanceParameters: {}", JsonConvert.SerializeObject(instanceParameters));
+            Logger.LogTrace("InstanceParameters: {}", JsonConvert.SerializeObject(instanceParameters));
             
-            string appId = GetRequiredValue(initializationInfo, "AppId");
-            string host = GetRequiredValue(initializationInfo, "Host");
-            string site = GetRequiredValue(initializationInfo, "Site");
+            AppId = GetRequiredValue(initializationInfo, "AppId");
+            Host = GetRequiredValue(initializationInfo, "Host");
+            Site = GetRequiredValue(initializationInfo, "Site");
             string pfxBase64 = GetRequiredValue(initializationInfo, "PfxBase64");
             string pfxPassword = GetRequiredValue(initializationInfo, "PfxPassword");
             
-            _logger.LogDebug("Configured with Initialization Parameters:\n" + 
-                             $"App ID: {appId}, Host: {host}, Site: {site}");
-            _logger.LogDebug($"PFX Base64: {pfxBase64}");
+            Logger.LogDebug("Configured with Initialization Parameters:\n" + 
+                             $"App ID: {AppId}, Host: {Host}, Site: {Site}");
+            Logger.LogDebug($"PFX Base64: {pfxBase64}");
 
-            string safe = GetRequiredValue(instanceParameters, "Safe");
-            string folder = GetRequiredValue(instanceParameters, "Folder");
-            string obj = GetRequiredValue(instanceParameters, "Object");
+            Safe = GetRequiredValue(instanceParameters, "Safe");
+            Folder = GetRequiredValue(instanceParameters, "Folder");
+            Object = GetRequiredValue(instanceParameters, "Object");
             
-            _logger.LogDebug("Configured with Instance Parameters:\n" + 
-                             $"Safe: {safe}, Folder: {folder}, Object: {obj}");
+            Logger.LogDebug("Configured with Instance Parameters:\n" + 
+                             $"Safe: {Safe}, Folder: {Folder}, Object: {Object}");
 
-            var httpClient = CyberArkVaultHttpClient.CreateWithClientCertificate(_logger, pfxBase64, pfxPassword, _handler);
-            
-            try
-            {
-                string password = httpClient.GetPassword(host, site, appId, safe, folder, obj)
-                    .GetAwaiter()
-                    .GetResult();
+            HttpClient = CyberArkVaultHttpClient.CreateWithClientCertificate(Logger, pfxBase64, pfxPassword, _handler);
 
-                _logger.LogInformation(
-                    $"Successfully retrieved secret for object '{obj}' from safe '{safe}' (AppID: {appId}).");
-                _logger.MethodExit();
-
-                return password;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error retrieving secret for object '{obj}' from safe '{safe}' (AppID: {appId}): {ex.Message}");
-
-                throw;
-            }
+            return GetPasswordFromCyberArk();
         }
     }
 }
