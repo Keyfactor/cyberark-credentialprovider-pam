@@ -9,6 +9,14 @@ In order for the Client-Auth Central Credential Provider to work, the Safe / Sec
 
 In order for the integration to take advantage of Client Certificate auth, please ensure that HTTPS is enabled and configured to require a Client Certificate. By default the site `AIMWebService` may be configured to require a Client Certificate.
 
+To read secrets stored in a CyberArk Vault safe, the Application ID must have at least the following permissions on the safe:
+- Monitor Safe
+- Retrieve files from Safe
+
+### Install PAM provider on a Universal Orchestrator Host (Remote) - manifest.json
+
+The default <code>manifest.json</code> needs to be replaced with the included <code>ClientAuth-manifest.json</code>. Rename the existing <code>manifest.json</code> as <code>Central-manifest.json</code> and then rename the <code>ClientAuth-manifest.json</code> to replace the original <code>manifest.json</code>.
+
 
 
 
@@ -36,7 +44,3 @@ echo $pfxBase64
 Importantly, the way authentication and restriction works for requests with the Central Credential provider are determined by the Application ID used. Additional rules can be set in Cyber Ark to enact restrictions on where the request for an Application ID needs to come from.
 
 After the Application ID is approved, the Central Credential Provider passes calls through an internally specified Provider object in Cyber Ark to the Vault.
-
-To read secrets stored in a CyberArk Vault safe, the Application ID must have at least the following permissions on the safe:
-- Monitor Safe
-- Retrieve files from Safe

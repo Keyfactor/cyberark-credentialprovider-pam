@@ -13,6 +13,8 @@ To read secrets stored in a CyberArk Vault safe, the Partner must have at least 
 - Monitor Safe
 - Retrieve files from Safe
 
+### Install PAM provider on a Universal Orchestrator Host (Remote) - manifest.json
+
 The default <code>manifest.json</code> needs to be replaced with the included <code>SDK-manifest.json</code>. Rename the existing <code>manifest.json</code> as <code>Central-manifest.json</code> and then rename the <code>SDK-manifest.json</code> to replace the original <code>manifest.json</code>.
 
 ### IMPORTANT NOTE FOR LINUX INSTALLATIONS
