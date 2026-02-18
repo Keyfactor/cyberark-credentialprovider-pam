@@ -13,13 +13,16 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Net;
+using System.Runtime.Serialization;
 
-namespace Keyfactor.Extensions.Pam.CyberArk
+namespace Keyfactor.Extensions.Pam.CyberArk.Exceptions
 {
-    public class AccountsResponse
+    [Serializable]
+    public class HttpClientException : Exception
     {
-        public string Content { get; set; }
+        public HttpClientException(string responseMessage, HttpStatusCode statusCode) : base($"Failed to retrieve secret from CyberArk Central Credential Provider. Status Code: {(int)statusCode} ({statusCode}). Response message: {responseMessage}")
+        {
+        }
     }
 }
