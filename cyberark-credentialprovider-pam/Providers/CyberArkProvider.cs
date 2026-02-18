@@ -17,7 +17,7 @@ using System.Collections.Generic;
 
 namespace Keyfactor.Extensions.Pam.CyberArk
 {
-    public class CyberArkProvider
+    public abstract class CyberArkProvider
     {
         protected string GetRequiredValue(Dictionary<string, string> dict, string key)
         {
