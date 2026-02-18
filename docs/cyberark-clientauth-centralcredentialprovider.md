@@ -1,16 +1,16 @@
 ## CyberArk-ClientAuth-CentralCredentialProvider
 
-The Cyber Ark Client-Auth Central Credential Provider (CCP) communicates with Cyber Ark over HTTPS with REST API calls, similar to the `CyberArk-CentralCredentialProvider` PAM type. However, this provider supports Client Certificate Authentication, which allows for more secure communication with the Cyber Ark instance.
-
+The Cyber Ark Client-Auth  Central Credential Provider (CCP) communicates with Cyber Ark over HTTPS with REST API calls.
 It does not require a local instance of the Cyber Ark Credential Provider to be installed.
 
 ## Requirements
 
-In order for the Central Credential Provider to work, the Safe / Secret being accessed need to be available to the Provider that the Cyber Ark server is using, and the Application ID needs to be usable from an external requestor. This may require adding IP address or other rules.
+In order for the Client-Auth Central Credential Provider to work, the Safe / Secret being accessed need to be available to the Provider that the Cyber Ark server is using, and the Application ID needs to be usable from an external requestor. This may require adding IP address or other rules.
 
 In order for the integration to take advantage of Client Certificate auth, please ensure that HTTPS is enabled and configured to require a Client Certificate. By default the site `AIMWebService` may be configured to require a Client Certificate.
 
-The default <code>manifest.json</code> needs to be replaced with the included <code>ClientAuth-manifest.json</code>. Rename the existing <code>manifest.json</code> as <code>Central-manifest.json</code> and then rename the <code>ClientAuth-manifest.json</code> to replace the original <code>manifest.json</code>.
+
+
 
 ## Mechanics
 The `CyberArk-ClientAuth-CentralCredentialProvider` PAM Provider Type communicates to a Cyber Ark instance using HTTPS. REST API calls are made to the host and site specified.
