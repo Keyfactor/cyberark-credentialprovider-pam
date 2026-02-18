@@ -7,7 +7,7 @@
       }
     }
   },
-  "Keyfactor:PAMProviders:CyberArk-CentralCredentialProvider:InitializationInfo": {
+  "Keyfactor:PAMProviders:CyberArk-ClientAuth-CentralCredentialProvider:InitializationInfo": {
     "AppId": "myappid",
     "Host": "my.cyberark.instance:99999",
     "Site": "WithOutCert",
