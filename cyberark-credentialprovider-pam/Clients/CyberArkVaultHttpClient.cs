@@ -79,7 +79,8 @@ namespace Keyfactor.Extensions.Pam.CyberArk.Clients
                 _logger.LogTrace($"Base address: {baseAddress}");
                 http.BaseAddress = new Uri(baseAddress);
                 
-                var path = $"{site}/api/Accounts?AppID={appId}&Safe={safe};Folder={folder};Object={obj}";
+                // TODO: Using Safe as the query parameter has been working, but appears to be named as SafeID in newer versions. Let's support both. For now, let's see if using just SafeID will work.
+                var path = $"{site}/api/Accounts?AppID={appId}&SafeID={safe};Folder={folder};Object={obj}";
                 
                 _logger.LogDebug($"Fetching secret from URL: {baseAddress}/{path}");
                 var response = await http.GetAsync(path);
