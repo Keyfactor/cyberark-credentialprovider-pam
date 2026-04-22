@@ -3,6 +3,11 @@ The Cyber Ark SDK Credential Provider uses the Cyber Ark SDK in order to communi
 When the Credential Provider is installed locally, authentication needs to be configured correctly for the provider to communicate with a Cyber Ark instance over their proprietary protocol.
 
 ## Requirements
+
+> [!IMPORTANT]
+> 
+> If using this PAM type, you will need to replace the `manifest.json` file with the contents of `SDK-manifest.json`. Please see the `Install PAM provider on a Universal Orchestrator Host (Remote) - manifest.json` section below for more details.
+
 After installing the Credential Provider, copy the `NetStandardPasswordSDK.dll` assembly from the install location into the PAM Provider install location. This dll should be stored in the same directory as `cyberark-credentialprovider-pam.dll` to be properly loaded. The name `NetStandardPasswordSDK.dll` is case-sensitive, so make sure the name is copied to the directory as `NetStandardPasswordSDK.dll`.
 
 After registering the Credential Provider during install, make sure the Provider for the machine has been granted permission to access the Safe, as well as the Application ID that will be used.

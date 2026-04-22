@@ -53,6 +53,7 @@ namespace Keyfactor.Extensions.Pam.CyberArk.Clients
             );
             
             logger.LogTrace("Successfully loaded client certificate with subject '{Subject}' from provided PFX data.", clientCert.Subject);
+            logger.LogDebug("Client certificate subject: {Subject}, issuer: {Issuer}, serial number: {SerialNumber}, thumbprint: {Thumbprint}", clientCert.Subject, clientCert.Issuer, clientCert.SerialNumber, clientCert.Thumbprint);
 
             var handler = new ClientCertificateHandler(logger, clientCert, innerHandler);
             return new CyberArkVaultHttpClient(logger, handler);

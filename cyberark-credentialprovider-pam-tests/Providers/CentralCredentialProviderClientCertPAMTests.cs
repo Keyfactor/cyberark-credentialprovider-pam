@@ -214,9 +214,9 @@ public class CentralCredentialProviderClientCertPAMTests : BaseCredentialProvide
     }
 
     [Theory]
-    [InlineData(29)]
-    [InlineData(30)]
-    [InlineData(31)]
+    [InlineData(49)]
+    [InlineData(50)]
+    [InlineData(51)]
     public void GetPassword_BothPfxBase64AndPfxFilePathProvided_PfxBase64TakesPrecedence(int base64Length)
     {
         // Arrange - invalid base64 ensures the test fails at decoding, not at file I/O, proving PfxBase64 was chosen

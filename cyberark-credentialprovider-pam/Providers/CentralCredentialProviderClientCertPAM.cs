@@ -1,3 +1,17 @@
+// Copyright 2026 Keyfactor
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -71,7 +85,7 @@ namespace Keyfactor.Extensions.Pam.CyberArk
                 Debug.Assert(pfxBase64 != null, nameof(pfxBase64) + " != null");
                 
                 Logger.LogDebug("Using PFX provided as Base64 string in initialization parameters.");
-                int displayLength = Math.Min(30, pfxBase64.Length);
+                int displayLength = Math.Min(50, pfxBase64.Length);
                 if (pfxBase64.Length > displayLength)
                 {
                     Logger.LogDebug(
