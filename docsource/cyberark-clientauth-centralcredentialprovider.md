@@ -58,3 +58,17 @@ echo $pfxBase64
 Importantly, authorization in the Central Credential Provider is governed by the Application ID. The Application in CyberArk can be configured with authentication restrictions that control exactly which callers are permitted to use it. For client certificate authentication specifically, CyberArk supports restricting an Application to only accept requests authenticated with a certificate matching specific attributes — such as serial number, subject, or issuer. This means administrators can pin the Application to the specific certificate issued to the Keyfactor Orchestrator, preventing any other caller from accessing it even if they know the Application ID. See [Application authentication methods](https://docs.cyberark.com/credential-providers/14.2/en/content/cp%20and%20ascp/application-authentication-methods-general.htm#) in the CyberArk documentation for details on configuring these restrictions.
 
 After the Application ID is approved, the Central Credential Provider passes calls through an internally specified Provider object in CyberArk to the Vault.
+
+## Migration Guide
+
+The `CyberArk-ClientAuth-CentralCredentialProvider` PAM Provider Type was introduced in version 2.2.0 of the CyberArk Credential Provider PAM plugin.
+
+### Migrating from plugin version 2.1.x or earlier
+- Install the latest PAM plugin version.
+- Create `CyberArk-ClientAuth-CentralCredentialProvider` PAM type in Keyfactor Command as documented in the [README](https://github.com/Keyfactor/cyberark-credentialprovider-pam).
+- Follow the instructions in the `Requirements` and `Mechanics` sections above to configure the new PAM type.
+- If installing version 2.3.0 or later, also follow the steps in the [2.2.x to 2.3.0](#migrating-from-plugin-version-22x-to-230-or-later) section below.
+
+### Migrating from plugin version 2.2.x to 2.3.0 or later
+- Update to the latest PAM plugin version.
+- Run the [update SQL script](https://github.com/Keyfactor/cyberark-credentialprovider-pam/blob/main/scripts/client_auth_add_pfx_file_path_pam_parameter.sql) against the Keyfactor Command database to add the new `PfxFilePath` initialization parameter to the existing PAM type.
