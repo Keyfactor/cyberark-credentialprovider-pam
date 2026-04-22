@@ -19,12 +19,15 @@ namespace Keyfactor.Extensions.Pam.CyberArk
 {
     public abstract class CyberArkProvider
     {
-        protected string GetRequiredValue(Dictionary<string, string> dict, string key)
+        protected const string InitializationInfoDictionaryName = "initialization info";
+        protected const string InstanceParametersDictionaryName = "instance parameter";
+
+        protected string GetRequiredValue(Dictionary<string, string> dict, string key, string dictionaryName)
         {
             if (!dict.ContainsKey(key)
                 || string.IsNullOrWhiteSpace(dict[key]))
             {
-                string error = $"Required field {key} was missing a value or was not defined as expected in dictionary.";
+                string error = $"Required {dictionaryName} field {key} was missing a value or was not defined as expected in dictionary.";
                 throw new ArgumentException(error);
             }
             return dict[key];
