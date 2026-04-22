@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Net.Http;
 using Keyfactor.Extensions.Pam.CyberArk.Clients;
 using Keyfactor.Logging;
@@ -107,6 +108,7 @@ namespace Keyfactor.Extensions.Pam.CyberArk
             {
                 Logger.LogDebug("Using PFX provided as file path in initialization parameters.");
                 Logger.LogDebug($"PFX File Path: {pfxFilePath}");
+                Logger.LogDebug($"Current working directory of service: {Directory.GetCurrentDirectory()}");
                 
                 try
                 {
@@ -114,7 +116,7 @@ namespace Keyfactor.Extensions.Pam.CyberArk
                     
                     var pfxBytes = System.IO.File.ReadAllBytes(pfxFilePath);
                     var pfxBase64FromFile = Convert.ToBase64String(pfxBytes);
-                    Logger.LogDebug($"Successfully read PFX file and converted to Base64 string. (Original file size: {pfxBytes.Length} bytes; Base64 string length: {pfxBase64FromFile.Length} characters)");
+                    Logger.LogDebug($"Successfully read PFX file and converted to Base64 string.");
                     
                     Logger.MethodExit();
                     

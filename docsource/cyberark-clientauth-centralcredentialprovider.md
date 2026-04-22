@@ -34,7 +34,7 @@ If both are supplied, `PfxBase64` takes precedence and `PfxFilePath` is ignored.
 
 > [!WARNING]
 > If `PfxFilePath` is specified but the file does not exist or the Orchestrator service account does not have read access to it, the PAM job will fail with a message similar to:
-> `Could not find file '/path/to/certificate.pfx'`
+> `Error reading PFX file from path '/path/to/client.pfx': Could not find file '/path/to/client.pfx'`
 
 The PFX password (`PfxPassword`) is always required regardless of which method is used to supply the certificate.
 

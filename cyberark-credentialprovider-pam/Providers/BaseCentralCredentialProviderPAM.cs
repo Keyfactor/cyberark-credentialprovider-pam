@@ -36,6 +36,8 @@ namespace Keyfactor.Extensions.Pam.CyberArk
         {
             try
             {
+                Logger.MethodEntry();
+                
                 string password = HttpClient.GetPassword(Host, Site, AppId, Safe, Folder, Object)
                     .GetAwaiter()
                     .GetResult();

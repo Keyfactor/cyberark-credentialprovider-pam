@@ -43,6 +43,7 @@ namespace Keyfactor.Extensions.Pam.CyberArk.Clients
             string pfxPassword,
             HttpMessageHandler innerHandler = null)
         {
+            logger.MethodEntry();
             logger.LogTrace("Creating CyberArkVaultHttpClient with client certificate authentication.");
             
             byte[] pfxBytes = Convert.FromBase64String(base64Pfx);
@@ -56,6 +57,7 @@ namespace Keyfactor.Extensions.Pam.CyberArk.Clients
             logger.LogDebug("Client certificate subject: {Subject}, issuer: {Issuer}, serial number: {SerialNumber}, thumbprint: {Thumbprint}", clientCert.Subject, clientCert.Issuer, clientCert.SerialNumber, clientCert.Thumbprint);
 
             var handler = new ClientCertificateHandler(logger, clientCert, innerHandler);
+            logger.MethodExit();
             return new CyberArkVaultHttpClient(logger, handler);
         }
 
@@ -90,7 +92,7 @@ namespace Keyfactor.Extensions.Pam.CyberArk.Clients
                 
                 if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogDebug("Successfully retrieved secret from CyberArk Central Credential Provider HTTP API.");
+                    _logger.LogTrace("Successfully retrieved secret from CyberArk Central Credential Provider HTTP API.");
                     _logger.MethodExit();
                     
                     var result = JsonConvert.DeserializeObject<AccountsResponse>(responseMessage);
@@ -109,13 +111,18 @@ public class ClientCertificateHandler : DelegatingHandler
     public ClientCertificateHandler(ILogger logger, X509Certificate2 clientCertificate, HttpMessageHandler innerHandler = null)
         : base(innerHandler ?? new HttpClientHandler())
     {
+        logger.MethodEntry();
+        
         if (InnerHandler is HttpClientHandler httpClientHandler)
         {
-            logger.LogInformation("Adding client certificate with subject '{Subject}' to HTTP client handler.", clientCertificate.Subject);
+            logger.LogInformation("Adding client certificate with subject '{Subject}' to HTTP client handler (serial number: '{SerialNumber}').", clientCertificate.Subject, clientCertificate.SerialNumber);
             httpClientHandler.ClientCertificates.Add(clientCertificate);
+            
+            logger.MethodExit();
             return;
         }
         
         logger.LogWarning("Inner handler is not an HttpClientHandler. Client certificate will not be added to HTTP requests.");
+        logger.MethodExit();
     }
 }

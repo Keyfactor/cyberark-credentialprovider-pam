@@ -38,10 +38,7 @@ public class CentralCredentialProviderClientCertPAMTests : BaseCredentialProvide
 
     public CentralCredentialProviderClientCertPAMTests(ITestOutputHelper output)
     {
-        var loggerFactory = LoggerFactory.Create(builder =>
-            builder.AddProvider(new XUnitLoggerProvider(output, new XUnitLoggerOptions()))
-                .SetMinimumLevel(LogLevel.Trace));
-        var logger = loggerFactory.CreateLogger<CentralCredentialProviderClientCertPAMTests>();
+        var logger = BuildLogger<CentralCredentialProviderClientCertPAM>(output);
 
         _testHttpMessageHandler = new TestHttpMessageHandler();
         _sut = new CentralCredentialProviderClientCertPAM(logger, _testHttpMessageHandler);
