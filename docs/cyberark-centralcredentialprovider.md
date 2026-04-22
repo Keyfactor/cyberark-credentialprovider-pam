@@ -1,7 +1,8 @@
 ## CyberArk-CentralCredentialProvider
 
-The Cyber Ark Central Credential Provider (CCP) communicates with Cyber Ark over HTTPS with REST API calls.
-It does not require a local instance of the Cyber Ark Credential Provider to be installed.
+The Cyber Ark Central Credential Provider (CCP) communicates with Cyber Ark over HTTPS with [REST API calls](https://docs.cyberark.com/credential-providers/latest/en/content/ccp/calling-the-web-service-using-rest.htm).
+
+It does not require a local instance of the Cyber Ark Credential Provider to be installed on the machine using the PAM Provider, however this PAM type **only supports anonymous authentication** to the Central Credential Provider API. Client authentication to Central Credential Provider is supported with the `CyberArk-ClientAuth-CentralCredentialProvider` PAM type.
 
 ## Requirements
 
@@ -18,7 +19,8 @@ To read secrets stored in a CyberArk Vault safe, the Application ID must have at
 
 ## Mechanics
 The `CyberArk-CentralCredentialProvider` PAM Provider Type communicates to a Cyber Ark instance using HTTPS. REST API calls are made to the host and site specified.
-As Client Certificate Auth is not currently supported, the target Site on the Cyber Ark instance needs to not require a certificate for authentication.
+
+As this PAM type only supports anonymous authentication, the target Site on the Cyber Ark instance needs to be configured for anonymous access.
 
 Importantly, the way authentication and restriction works for requests with the Central Credential provider are determined by the Application ID used. Additional rules can be set in Cyber Ark to enact restrictions on where the request for an Application ID needs to come from.
 

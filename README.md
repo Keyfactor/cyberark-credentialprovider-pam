@@ -261,6 +261,10 @@ Below is the payload to `POST` to the Keyfactor Command API
 
 
 #### Requirements
+   > [!IMPORTANT]
+   > 
+   > If using this PAM type, you will need to replace the `manifest.json` file with the contents of `ClientAuth-manifest.json`. Please see the `Install PAM provider on a Universal Orchestrator Host (Remote) - manifest.json` section below for more details.
+
    In order for the Client-Auth Central Credential Provider to work, the Safe / Secret being accessed need to be available to the Provider that the Cyber Ark server is using, and the Application ID needs to be usable from an external requestor. This may require adding IP address or other rules.
 
    In order for the integration to take advantage of Client Certificate auth, please ensure that HTTPS is enabled and configured to require a Client Certificate. By default the site `AIMWebService` may be configured to require a Client Certificate.
@@ -318,7 +322,14 @@ Below is the payload to `POST` to the Keyfactor Command API
             "DisplayName": "PFX Base64",
             "DataType": 1,
             "InstanceLevel": false,
-            "Description": "The Base64-encoded PFX certificate used for authentication."
+            "Description": "The Base64-encoded PFX certificate used for authentication. This is an alternative to providing a file path. If populated with empty spaces or 'none', it will be ignored and the provider will look for a file path instead. If both PfxBase64 and PfxFilePath are provided, PfxBase64 will take precedence."
+        },
+        {
+            "Name": "PfxFilePath",
+            "DisplayName": "PFX File Path",
+            "DataType": 1,
+            "InstanceLevel": false,
+            "Description": "The relative or absolute file path to the PFX certificate used for authentication. This is an alternative to providing a Base64-encoded PFX. If populated with empty spaces or 'none', it will be ignored and the provider will look for a Base64-encoded PFX instead. If both PfxBase64 and PfxFilePath are provided, PfxBase64 will take precedence."
         },
         {
             "Name": "PfxPassword",
@@ -460,6 +471,10 @@ Below is the payload to `POST` to the Keyfactor Command API
 
 
 #### Requirements
+   > [!IMPORTANT]
+   > 
+   > If using this PAM type, you will need to replace the `manifest.json` file with the contents of `SDK-manifest.json`. Please see the `Install PAM provider on a Universal Orchestrator Host (Remote) - manifest.json` section below for more details.
+
    After installing the Credential Provider, copy the `NetStandardPasswordSDK.dll` assembly from the install location into the PAM Provider install location. This dll should be stored in the same directory as `cyberark-credentialprovider-pam.dll` to be properly loaded. The name `NetStandardPasswordSDK.dll` is case-sensitive, so make sure the name is copied to the directory as `NetStandardPasswordSDK.dll`.
 
    After registering the Credential Provider during install, make sure the Provider for the machine has been granted permission to access the Safe, as well as the Application ID that will be used.
@@ -779,7 +794,8 @@ When entering Secret fields, select the **Load From Keyfactor Secrets** tab, and
 | AppId | Application ID | The Application ID with access set up for the Safe used to identify and authenticate requests. |
 | Host | CyberArk Host and Port | The hostname (IP address or domain name) and (optionally) port. It should take the format: my.cyberark.instance:404 (note: no https:// included). |
 | Site | CyberArk API Site | By default, AIMWebService is the site name, but may be deployed to another site name. |
-| PfxBase64 | PFX Base64 | The Base64-encoded PFX certificate used for authentication. |
+| PfxBase64 | PFX Base64 | The Base64-encoded PFX certificate used for authentication. This is an alternative to providing a file path. If populated with empty spaces or 'none', it will be ignored and the provider will look for a file path instead. If both PfxBase64 and PfxFilePath are provided, PfxBase64 will take precedence. |
+| PfxFilePath | PFX File Path | The relative or absolute file path to the PFX certificate used for authentication. This is an alternative to providing a Base64-encoded PFX. If populated with empty spaces or 'none', it will be ignored and the provider will look for a Base64-encoded PFX instead. If both PfxBase64 and PfxFilePath are provided, PfxBase64 will take precedence. |
 | PfxPassword | PFX Password | The password for the PFX certificate used for authentication. |
 
 
