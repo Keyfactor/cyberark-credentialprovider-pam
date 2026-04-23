@@ -82,7 +82,7 @@ namespace Keyfactor.Extensions.Pam.CyberArk.Clients
                 _logger.LogTrace($"Base address: {baseAddress}");
                 http.BaseAddress = new Uri(baseAddress);
                 
-                var path = $"{site}/api/Accounts?AppID={appId}&Safe={safe};Folder={folder};Object={obj}";
+                var path = $"{site}/api/Accounts?AppID={appId}&Safe={safe}&Object={obj};Folder={folder}";
                 
                 _logger.LogDebug($"Fetching secret from URL: {baseAddress}/{path}");
                 var response = await http.GetAsync(path);
@@ -115,7 +115,7 @@ public class ClientCertificateHandler : DelegatingHandler
         
         if (InnerHandler is HttpClientHandler httpClientHandler)
         {
-            logger.LogInformation("Adding client certificate with subject '{Subject}' to HTTP client handler (serial number: '{SerialNumber}').", clientCertificate.Subject, clientCertificate.SerialNumber);
+            logger.LogInformation("Adding client certificate with subject '{Subject}' to HTTP client handler (thumbprint: '{Thumbprint}').", clientCertificate.Subject, clientCertificate.Thumbprint);
             httpClientHandler.ClientCertificates.Add(clientCertificate);
             
             logger.MethodExit();
