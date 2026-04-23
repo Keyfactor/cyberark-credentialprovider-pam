@@ -1,6 +1,6 @@
 ## Overview
-The Cyber Ark SDK Credential Provider uses the Cyber Ark SDK in order to communicate with a locally installed [Credential Provider](https://docs.cyberark.com/credential-providers/latest/en/content/cp%20and%20ascp/lp_cp.htm).
-When the Credential Provider is installed locally, authentication needs to be configured correctly for the provider to communicate with a Cyber Ark instance over their proprietary protocol.
+The CyberArk SDK Credential Provider uses the CyberArk SDK in order to communicate with a locally installed [Credential Provider](https://docs.cyberark.com/credential-providers/latest/en/content/cp%20and%20ascp/lp_cp.htm).
+When the Credential Provider is installed locally, authentication needs to be configured correctly for the provider to communicate with a CyberArk instance over their proprietary protocol.
 
 ## Requirements
 
@@ -31,7 +31,7 @@ By default, the Universal Orchestrator Linux service has [PrivateTmp](https://ww
 PrivateTmp=false
 ```
 
-and then run the following commands to restart the service deemon and the Universal Orchestrator service:
+and then run the following commands to restart the service daemon and the Universal Orchestrator service:
 
 ```bash
 sudo systemctl daemon-reload
@@ -39,8 +39,8 @@ sudo systemctl restart keyfactor-orchestrator-default.service
 ```
 
 ## Mechanics
-The `CyberArk-SdkCredentialProvider` PAM Provider Type uses an installed Credential Provider to communicate over a proprietary protocol to a Cyber Ark instance. The specifics of this communication, such as the port used, the Provider name, and the authenticated Cyber Ark user, are specified during the installation of the Credential Provider and are not managed by the Keyfactor PAM Provider plugin.
-Requests are sent using the specified Application ID through the Credential Provider. The Application Id, configured Provider name, and the user authenticated in the Credential Provider all need to have the correct permissions set to access Secrets directly in a Cyber Ark Vault.
+The `CyberArk-SdkCredentialProvider` PAM Provider Type uses an installed Credential Provider to communicate over a proprietary protocol to a CyberArk instance. The specifics of this communication, such as the port used, the Provider name, and the authenticated CyberArk user, are specified during the installation of the Credential Provider and are not managed by the Keyfactor PAM Provider plugin.
+Requests are sent using the specified Application ID through the Credential Provider. The Application Id, configured Provider name, and the user authenticated in the Credential Provider all need to have the correct permissions set to access Secrets directly in a CyberArk Vault.
 
 _About `Options`:_
 Additional options can be set in the `manifest.json` file in the `Options` section. The available options are already included in the sample `SDK-manifest.json`.
