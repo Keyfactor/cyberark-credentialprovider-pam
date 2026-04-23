@@ -92,7 +92,14 @@
               "DisplayName": "PFX Base64",
               "DataType": 1,
               "InstanceLevel": false,
-              "Description": "The Base64-encoded PFX certificate used for authentication."
+              "Description": "The Base64-encoded PFX certificate used for authentication. This is an alternative to providing a file path. If populated with empty spaces or 'none', it will be ignored and the provider will look for a file path instead. If both PfxBase64 and PfxFilePath are provided, PfxBase64 will take precedence."
+            },
+            {
+              "Name": "PfxFilePath",
+              "DisplayName": "PFX File Path",
+              "DataType": 1,
+              "InstanceLevel": false,
+              "Description": "The relative or absolute file path to the PFX certificate used for authentication. This is an alternative to providing a Base64-encoded PFX. If populated with empty spaces or 'none', it will be ignored and the provider will look for a Base64-encoded PFX instead. If both PfxBase64 and PfxFilePath are provided, PfxBase64 will take precedence."
             },
             {
               "Name": "PfxPassword",
