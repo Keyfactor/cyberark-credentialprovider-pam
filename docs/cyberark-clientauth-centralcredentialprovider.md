@@ -1,8 +1,8 @@
 ## CyberArk-ClientAuth-CentralCredentialProvider
 
-The Cyber Ark Client-Auth Central Credential Provider (CCP) communicates with Cyber Ark over HTTPS with [REST API calls](https://docs.cyberark.com/credential-providers/latest/en/content/ccp/calling-the-web-service-using-rest.htm), using client certificate authentication for secure communication.
+The CyberArk Client-Auth Central Credential Provider (CCP) communicates with CyberArk over HTTPS with [REST API calls](https://docs.cyberark.com/credential-providers/latest/en/content/ccp/calling-the-web-service-using-rest.htm), using client certificate authentication for secure communication.
 
-It does not require a local instance of the Cyber Ark Credential Provider to be installed on the machine using the PAM Provider.
+It does not require a local instance of the CyberArk Credential Provider to be installed on the machine using the PAM Provider.
 
 ## Requirements
 
@@ -10,7 +10,7 @@ It does not require a local instance of the Cyber Ark Credential Provider to be 
 > 
 > If using this PAM type, you will need to replace the `manifest.json` file with the contents of `ClientAuth-manifest.json`. Please see the `Install PAM provider on a Universal Orchestrator Host (Remote) - manifest.json` section below for more details.
 
-In order for the Client-Auth Central Credential Provider to work, the Safe / Secret being accessed need to be available to the Provider that the Cyber Ark server is using, and the Application ID needs to be usable from an external requestor. This may require adding IP address or other rules.
+In order for the Client-Auth Central Credential Provider to work, the Safe / Secret being accessed need to be available to the Provider that the CyberArk server is using, and the Application ID needs to be usable from an external requestor. This may require adding IP address or other rules.
 
 In order for the integration to take advantage of Client Certificate auth, please ensure that HTTPS is enabled and configured to require a Client Certificate. By default the site `AIMWebService` may be configured to require a Client Certificate.
 
@@ -26,7 +26,7 @@ The default <code>manifest.json</code> needs to be replaced with the included <c
 
 
 ## Mechanics
-The `CyberArk-ClientAuth-CentralCredentialProvider` PAM Provider Type communicates to a Cyber Ark instance using HTTPS. REST API calls are made to the host and site specified.
+The `CyberArk-ClientAuth-CentralCredentialProvider` PAM Provider Type communicates to a CyberArk instance using HTTPS. REST API calls are made to the host and site specified.
 
 The Client Authentication certificate may be provided in one of two ways via the initialization parameters:
 

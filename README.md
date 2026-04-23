@@ -80,7 +80,7 @@ The CyberArk PAM Provider implements 3 PAM Types. Depending on your use case, yo
 
 
 #### Requirements
-   In order for the Central Credential Provider to work, the Safe / Secret being accessed need to be available to the Provider that the Cyber Ark server is using, and the Application ID needs to be usable from an external requestor. This may require adding IP address or other rules.
+   In order for the Central Credential Provider to work, the Safe / Secret being accessed need to be available to the Provider that the CyberArk server is using, and the Application ID needs to be usable from an external requestor. This may require adding IP address or other rules.
 
    Certificate Authentication is not currently supported and needs to be disabled. This may necessitate creating a Site that allows HTTPS requests but does not require a Client Certificate to authenticate. By default the site `AIMWebService` may require a Client Certificate, which would need to be edited or have another site created.
 
@@ -265,7 +265,7 @@ Below is the payload to `POST` to the Keyfactor Command API
    > 
    > If using this PAM type, you will need to replace the `manifest.json` file with the contents of `ClientAuth-manifest.json`. Please see the `Install PAM provider on a Universal Orchestrator Host (Remote) - manifest.json` section below for more details.
 
-   In order for the Client-Auth Central Credential Provider to work, the Safe / Secret being accessed need to be available to the Provider that the Cyber Ark server is using, and the Application ID needs to be usable from an external requestor. This may require adding IP address or other rules.
+   In order for the Client-Auth Central Credential Provider to work, the Safe / Secret being accessed need to be available to the Provider that the CyberArk server is using, and the Application ID needs to be usable from an external requestor. This may require adding IP address or other rules.
 
    In order for the integration to take advantage of Client Certificate auth, please ensure that HTTPS is enabled and configured to require a Client Certificate. By default the site `AIMWebService` may be configured to require a Client Certificate.
 
@@ -498,7 +498,7 @@ Below is the payload to `POST` to the Keyfactor Command API
    PrivateTmp=false
    ```
 
-   and then run the following commands to restart the service deemon and the Universal Orchestrator service:
+   and then run the following commands to restart the service daemon and the Universal Orchestrator service:
 
    ```bash
    sudo systemctl daemon-reload
