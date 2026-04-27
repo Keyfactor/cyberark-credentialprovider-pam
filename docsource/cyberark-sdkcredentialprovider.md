@@ -1,8 +1,13 @@
 ## Overview
-The Cyber Ark SDK Credential Provider uses the Cyber Ark SDK in order to communicate with a locally installed [Credential Provider](https://docs.cyberark.com/credential-providers/latest/en/content/cp%20and%20ascp/lp_cp.htm).
-When the Credential Provider is installed locally, authentication needs to be configured correctly for the provider to communicate with a Cyber Ark instance over their proprietary protocol.
+The CyberArk SDK Credential Provider uses the CyberArk SDK in order to communicate with a locally installed [Credential Provider](https://docs.cyberark.com/credential-providers/latest/en/content/cp%20and%20ascp/lp_cp.htm).
+When the Credential Provider is installed locally, authentication needs to be configured correctly for the provider to communicate with a CyberArk instance over their proprietary protocol.
 
 ## Requirements
+
+> [!IMPORTANT]
+> 
+> If using this PAM type, you will need to replace the `manifest.json` file with the contents of `SDK-manifest.json`. Please see the `Install PAM provider on a Universal Orchestrator Host (Remote) - manifest.json` section below for more details.
+
 After installing the Credential Provider, copy the `NetStandardPasswordSDK.dll` assembly from the install location into the PAM Provider install location. This dll should be stored in the same directory as `cyberark-credentialprovider-pam.dll` to be properly loaded. The name `NetStandardPasswordSDK.dll` is case-sensitive, so make sure the name is copied to the directory as `NetStandardPasswordSDK.dll`.
 
 After registering the Credential Provider during install, make sure the Provider for the machine has been granted permission to access the Safe, as well as the Application ID that will be used.
@@ -13,7 +18,7 @@ To read secrets stored in a CyberArk Vault safe, the Partner must have at least 
 
 ### Install PAM provider on a Universal Orchestrator Host (Remote) - manifest.json
 
-The default <code>manifest.json</code> needs to be replaced with the included <code>SDK-manifest.json</code>. Rename the existing <code>manifest.json</code> as <code>Central-manifest.json</code> and then rename the <code>SDK-manifest.json</code> to replace the original <code>manifest.json</code>.
+The default `manifest.json` included with the extension download needs to be replaced by the included `SDK-manifest.json`. Rename the existing `manifest.json` as `Central-manifest.json` and then rename the `SDK-manifest.json` to replace the original `manifest.json`.
 
 ### IMPORTANT NOTE FOR LINUX INSTALLATIONS
 
@@ -26,7 +31,7 @@ By default, the Universal Orchestrator Linux service has [PrivateTmp](https://ww
 PrivateTmp=false
 ```
 
-and then run the following commands to restart the service deemon and the Universal Orchestrator service:
+and then run the following commands to restart the service daemon and the Universal Orchestrator service:
 
 ```bash
 sudo systemctl daemon-reload
@@ -34,8 +39,8 @@ sudo systemctl restart keyfactor-orchestrator-default.service
 ```
 
 ## Mechanics
-The `CyberArk-SdkCredentialProvider` PAM Provider Type uses an installed Credential Provider to communicate over a proprietary protocol to a Cyber Ark instance. The specifics of this communication, such as the port used, the Provider name, and the authenticated Cyber Ark user, are specified during the installation of the Credential Provider and are not managed by the Keyfactor PAM Provider plugin.
-Requests are sent using the specified Application ID through the Credential Provider. The Application Id, configured Provider name, and the user authenticated in the Credential Provider all need to have the correct permissions set to access Secrets directly in a Cyber Ark Vault.
+The `CyberArk-SdkCredentialProvider` PAM Provider Type uses an installed Credential Provider to communicate over a proprietary protocol to a CyberArk instance. The specifics of this communication, such as the port used, the Provider name, and the authenticated CyberArk user, are specified during the installation of the Credential Provider and are not managed by the Keyfactor PAM Provider plugin.
+Requests are sent using the specified Application ID through the Credential Provider. The Application Id, configured Provider name, and the user authenticated in the Credential Provider all need to have the correct permissions set to access Secrets directly in a CyberArk Vault.
 
 _About `Options`:_
 Additional options can be set in the `manifest.json` file in the `Options` section. The available options are already included in the sample `SDK-manifest.json`.

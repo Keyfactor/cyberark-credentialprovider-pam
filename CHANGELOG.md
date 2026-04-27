@@ -1,3 +1,7 @@
+# 2.3.0
+## Features
+- Added support for providing the client certificate as either a Base64-encoded string or as a file path to a PFX, with precedence given to the Base64-encoded string when both are provided.
+
 # 2.2.0
 ## Features
 - Added client authentication support for the CyberArk Credential Provider with the `CyberArk-ClientAuth-CentralCredentialProvider` PAM type.

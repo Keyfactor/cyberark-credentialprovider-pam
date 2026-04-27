@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using MartinCostello.Logging.XUnit;
+using Microsoft.Extensions.Logging;
+using Xunit.Abstractions;
+
 namespace cyberark_credentialprovider_pam_tests.Providers;
 
 public abstract class BaseCredentialProviderPAMTest
@@ -27,4 +31,13 @@ public abstract class BaseCredentialProviderPAMTest
     
     protected abstract Dictionary<string, string> CreateInitializationInfo();
     protected abstract Dictionary<string, string> CreateInstanceParams();
+
+    protected ILogger BuildLogger<T>(ITestOutputHelper output, LogLevel logLevel = LogLevel.Trace)
+    {
+        var loggerFactory = LoggerFactory.Create(builder =>
+            builder.AddProvider(new XUnitLoggerProvider(output, new XUnitLoggerOptions()))
+                .SetMinimumLevel(logLevel));
+        
+        return loggerFactory.CreateLogger<CentralCredentialProviderPAMTests>();
+    }
 }
