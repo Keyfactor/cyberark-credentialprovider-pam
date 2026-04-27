@@ -19,7 +19,7 @@ To read secrets stored in a CyberArk Vault safe, the Application ID must have at
 
 ### Install PAM provider on a Universal Orchestrator Host (Remote) - manifest.json
 
-The default <code>manifest.json</code> needs to be replaced with the included <code>ClientAuth-manifest.json</code>. Rename the existing <code>manifest.json</code> as <code>Central-manifest.json</code> and then rename the <code>ClientAuth-manifest.json</code> to replace the original <code>manifest.json</code>.
+The default `manifest.json` included with the extension download needs to be replaced by the included `ClientAuth-manifest.json`. Rename the existing `manifest.json` as `Central-manifest.json` and then rename the `ClientAuth-manifest.json` to replace the original `manifest.json`.
 
 
 ## Mechanics
@@ -28,13 +28,17 @@ The `CyberArk-ClientAuth-CentralCredentialProvider` PAM Provider Type communicat
 The Client Authentication certificate may be provided in one of two ways via the initialization parameters:
 
 - **PFX Base64** (`PfxBase64`): the PFX certificate encoded as a Base64 string.
-- **PFX File Path** (`PfxFilePath`): a relative or absolute path to a PFX file on the machine running the Universal Orchestrator. Relative paths are resolved against the working directory of the Orchestrator / Keyfactor Command service. The service running the Orchestrator / Keyfactor Command must have read access to the file.
+- **PFX File Path** (`PfxFilePath`): a relative or absolute path to a PFX file on the machine running the Universal Orchestrator. Relative paths are resolved against the working directory of the Orchestrator or Keyfactor Command service. **The account running the Orchestrator or Keyfactor Command service must have read access to the file.**
 
 If both are supplied, `PfxBase64` takes precedence and `PfxFilePath` is ignored. If either field is set to an empty value, whitespace, or the literal string `none`, it is treated as if it was not provided. If neither field resolves to a usable value, the PAM job will fail with an error.
 
 > [!WARNING]
-> If `PfxFilePath` is specified but the file does not exist or the Orchestrator service account does not have read access to it, the PAM job will fail with a message similar to:
-> `Error reading PFX file from path '/path/to/client.pfx': Could not find file '/path/to/client.pfx'`
+> If `PfxFilePath` is specified but the file cannot be read, the PAM job will fail. Common causes and their error messages:
+> - **File not found**: `Could not find file '/path/to/client.pfx'`
+> - **Permission denied**: `Access to the path '/path/to/client.pfx' is denied.`
+>
+> Ensure the file exists at the specified path and that the account running the Orchestrator or Keyfactor Command service has read access to it.
+
 
 The PFX password (`PfxPassword`) is always required regardless of which method is used to supply the certificate.
 

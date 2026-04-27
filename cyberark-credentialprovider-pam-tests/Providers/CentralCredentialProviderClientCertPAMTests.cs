@@ -183,11 +183,13 @@ public class CentralCredentialProviderClientCertPAMTests : BaseCredentialProvide
         // Arrange
         var initializationInfo = CreateInitializationInfo();
         var instanceParams = CreateInstanceParams();
+        var path = "/nonexistent/path/to/certificate.pfx";
         initializationInfo.Remove("PfxBase64");
-        initializationInfo["PfxFilePath"] = "/nonexistent/path/to/certificate.pfx";
+        initializationInfo["PfxFilePath"] = path;
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => _sut.GetPassword(instanceParams, initializationInfo));
+        var exception = Assert.Throws<ArgumentException>(() => _sut.GetPassword(instanceParams, initializationInfo));
+        Assert.Contains($"Error reading PFX file from path '{path}'", exception.Message);
     }
 
     [Theory]

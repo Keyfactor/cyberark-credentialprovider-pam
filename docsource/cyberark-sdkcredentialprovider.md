@@ -18,7 +18,7 @@ To read secrets stored in a CyberArk Vault safe, the Partner must have at least 
 
 ### Install PAM provider on a Universal Orchestrator Host (Remote) - manifest.json
 
-The default <code>manifest.json</code> needs to be replaced with the included <code>SDK-manifest.json</code>. Rename the existing <code>manifest.json</code> as <code>Central-manifest.json</code> and then rename the <code>SDK-manifest.json</code> to replace the original <code>manifest.json</code>.
+The default `manifest.json` included with the extension download needs to be replaced by the included `SDK-manifest.json`. Rename the existing `manifest.json` as `Central-manifest.json` and then rename the `SDK-manifest.json` to replace the original `manifest.json`.
 
 ### IMPORTANT NOTE FOR LINUX INSTALLATIONS
 

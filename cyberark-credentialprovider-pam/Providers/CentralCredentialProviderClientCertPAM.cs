@@ -50,7 +50,7 @@ namespace Keyfactor.Extensions.Pam.CyberArk
         {
             Logger.MethodEntry();
             
-            Logger.LogTrace("InstanceParameters: {}", JsonConvert.SerializeObject(instanceParameters));
+            Logger.LogTrace($"InstanceParameters: {JsonConvert.SerializeObject(instanceParameters)}");
             
             AppId = GetRequiredValue(initializationInfo, "AppId", InitializationInfoDictionaryName);
             Host = GetRequiredValue(initializationInfo, "Host", InitializationInfoDictionaryName);
@@ -81,20 +81,21 @@ namespace Keyfactor.Extensions.Pam.CyberArk
             Logger.LogTrace("Fetching PfxBase64 from initialization info parameters...");
             var pfxBase64 = initializationInfo.TryGetValue("PfxBase64", out string base64Param) ? base64Param : null;
 
-            if (IsValueProvided(pfxBase64))
+            if (IsValueProvided(pfxBase64, "pfxBase64"))
             {
+                // Inform Intellisense that pfxBase64 is not null for the code below
                 Debug.Assert(pfxBase64 != null, nameof(pfxBase64) + " != null");
                 
-                Logger.LogDebug("Using PFX provided as Base64 string in initialization parameters.");
+                Logger.LogTrace("Using PFX provided as Base64 string in initialization parameters.");
                 int displayLength = Math.Min(50, pfxBase64.Length);
                 if (pfxBase64.Length > displayLength)
                 {
-                    Logger.LogDebug(
+                    Logger.LogTrace(
                         $"PFX Base64 Value (truncated): {pfxBase64.Substring(0, displayLength)}... (length: {pfxBase64.Length} characters)");
                 }
                 else
                 {
-                    Logger.LogDebug($"PFX Base64 Value (full): {pfxBase64} (length: {pfxBase64.Length} characters)");
+                    Logger.LogTrace($"PFX Base64 Value (full): {pfxBase64} (length: {pfxBase64.Length} characters)");
                 }
 
                 Logger.MethodExit();
@@ -104,19 +105,19 @@ namespace Keyfactor.Extensions.Pam.CyberArk
             
             var pfxFilePath = initializationInfo.TryGetValue("PfxFilePath", out string filePathParam) ? filePathParam : null;
             
-            if (IsValueProvided(pfxFilePath))
+            if (IsValueProvided(pfxFilePath, "pfxFilePath"))
             {
-                Logger.LogDebug("Using PFX provided as file path in initialization parameters.");
-                Logger.LogDebug($"PFX File Path: {pfxFilePath}");
-                Logger.LogDebug($"Current working directory of service: {Directory.GetCurrentDirectory()}");
+                Logger.LogTrace("Using PFX provided as file path in initialization parameters.");
+                Logger.LogDebug($"PFX File Path: {pfxFilePath}, current working directory of service: {Directory.GetCurrentDirectory()}");
                 
                 try
                 {
+                    // Inform Intellisense that pfxFilePath is not null for the code below
                     Debug.Assert(pfxFilePath != null, nameof(pfxFilePath) + " != null");
                     
                     var pfxBytes = System.IO.File.ReadAllBytes(pfxFilePath);
                     var pfxBase64FromFile = Convert.ToBase64String(pfxBytes);
-                    Logger.LogDebug($"Successfully read PFX file and converted to Base64 string.");
+                    Logger.LogDebug("Successfully read PFX file and converted to Base64 string.");
                     
                     Logger.MethodExit();
                     
@@ -132,10 +133,12 @@ namespace Keyfactor.Extensions.Pam.CyberArk
             throw new ArgumentException("Either PfxBase64 or PfxFilePath must be provided in initialization info");
         }
 
-        private bool IsValueProvided(string value)
+        private bool IsValueProvided(string value, string descriptor)
         {
-            return !string.IsNullOrWhiteSpace(value) &&
+            var isValueProvided = !string.IsNullOrWhiteSpace(value) &&
                    !value.Equals("none", StringComparison.InvariantCultureIgnoreCase);
+            Logger.LogTrace($"Is {descriptor} value provided: {isValueProvided}");
+            return isValueProvided;
         }
     }
 }
