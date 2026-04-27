@@ -14,11 +14,15 @@
 
 using System;
 using System.Collections.Generic;
+using Keyfactor.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Keyfactor.Extensions.Pam.CyberArk
 {
     public abstract class CyberArkProvider
     {
+        protected ILogger Logger;
+        
         protected const string InitializationInfoDictionaryName = "initialization info";
         protected const string InstanceParametersDictionaryName = "instance parameter";
 
@@ -28,6 +32,7 @@ namespace Keyfactor.Extensions.Pam.CyberArk
                 || string.IsNullOrWhiteSpace(dict[key]))
             {
                 string error = $"Required {dictionaryName} field {key} was missing a value or was not defined as expected in dictionary.";
+                Logger.LogError(error);
                 throw new ArgumentException(error);
             }
             return dict[key];

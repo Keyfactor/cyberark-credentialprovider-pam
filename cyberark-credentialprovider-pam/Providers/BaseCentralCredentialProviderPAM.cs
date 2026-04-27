@@ -22,7 +22,6 @@ namespace Keyfactor.Extensions.Pam.CyberArk
 {
     public abstract class BaseCentralCredentialProviderPAM : CyberArkProvider
     {
-        protected ILogger Logger;
         protected CyberArkVaultHttpClient HttpClient;
         
         protected string Host { get; set; }

@@ -25,8 +25,7 @@ namespace Keyfactor.Extensions.Pam.CyberArk
     public class SdkCredentialProviderPAM : CyberArkProvider, IPAMProvider
     {
         public string Name => "CyberArk-SdkCredentialProvider";
-
-        private readonly ILogger Logger;
+        
         private readonly Constants.SDK SDKConstants;
         private readonly string ExtensionPath;
         private readonly bool UsingFrameworkLibrary = false;
