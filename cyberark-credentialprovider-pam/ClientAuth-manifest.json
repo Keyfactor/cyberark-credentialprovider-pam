@@ -10,8 +10,9 @@
   "Keyfactor:PAMProviders:CyberArk-ClientAuth-CentralCredentialProvider:InitializationInfo": {
     "AppId": "myappid",
     "Host": "my.cyberark.instance:99999",
-    "Site": "WithOutCert",
+    "Site": "AIMWebService",
     "PfxBase64": "yourbase64encodedpfx",
+    "PfxFilePath": "/path/to/certificate.pfx",
     "PfxPassword": "yourpfxpassword"
   }
 }

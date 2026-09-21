@@ -49,16 +49,16 @@ namespace Keyfactor.Extensions.Pam.CyberArk
             Logger.LogTrace("InitializationInfo: {}", JsonConvert.SerializeObject(initializationInfo));
             Logger.LogTrace("InstanceParameters: {}", JsonConvert.SerializeObject(instanceParameters));
             
-            AppId = GetRequiredValue(initializationInfo, "AppId");
-            Host = GetRequiredValue(initializationInfo, "Host");
-            Site = GetRequiredValue(initializationInfo, "Site");
+            AppId = GetRequiredValue(initializationInfo, "AppId", InitializationInfoDictionaryName);
+            Host = GetRequiredValue(initializationInfo, "Host", InitializationInfoDictionaryName);
+            Site = GetRequiredValue(initializationInfo, "Site", InitializationInfoDictionaryName);
             
             Logger.LogDebug("Configured with Initialization Parameters:\n" + 
                                    $"App ID: {AppId}, Host: {Host}, Site: {Site}");
 
-            Safe = GetRequiredValue(instanceParameters, "Safe");
-            Folder = GetRequiredValue(instanceParameters, "Folder");
-            Object = GetRequiredValue(instanceParameters, "Object");
+            Safe = GetRequiredValue(instanceParameters, "Safe", InstanceParametersDictionaryName);
+            Folder = GetRequiredValue(instanceParameters, "Folder", InstanceParametersDictionaryName);
+            Object = GetRequiredValue(instanceParameters, "Object", InstanceParametersDictionaryName);
             
             Logger.LogDebug("Configured with Instance Parameters:\n" + 
                              $"Safe: {Safe}, Folder: {Folder}, Object: {Object}");
