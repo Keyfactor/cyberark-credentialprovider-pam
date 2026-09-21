@@ -22,8 +22,25 @@ To read secrets stored in a CyberArk Vault safe, the Application ID must have at
 
 The default `manifest.json` included with the extension download needs to be replaced by the included `ClientAuth-manifest.json`. Rename the existing `manifest.json` as `Central-manifest.json` and then rename the `ClientAuth-manifest.json` to replace the original `manifest.json`.
 
+The CyberArk Client-Auth Central Credential Provider (CCP) communicates with CyberArk over HTTPS with [REST API calls](https://docs.cyberark.com/credential-providers/latest/en/content/ccp/calling-the-web-service-using-rest.htm), using client certificate authentication for secure communication.
 
+It does not require a local instance of the CyberArk Credential Provider to be installed on the machine using the PAM Provider.
 
+> [!IMPORTANT]
+> 
+> If using this PAM type, you will need to replace the `manifest.json` file with the contents of `ClientAuth-manifest.json`. Please see the `Install PAM provider on a Universal Orchestrator Host (Remote) - manifest.json` section below for more details.
+
+In order for the Client-Auth Central Credential Provider to work, the Safe / Secret being accessed need to be available to the Provider that the CyberArk server is using, and the Application ID needs to be usable from an external requestor. This may require adding IP address or other rules.
+
+In order for the integration to take advantage of Client Certificate auth, please ensure that HTTPS is enabled and configured to require a Client Certificate. By default the site `AIMWebService` may be configured to require a Client Certificate.
+
+To read secrets stored in a CyberArk Vault safe, the Application ID must have at least the following permissions on the safe:
+- Monitor Safe
+- Retrieve files from Safe
+
+### Install PAM provider on a Universal Orchestrator Host (Remote) - manifest.json
+
+The default `manifest.json` included with the extension download needs to be replaced by the included `ClientAuth-manifest.json`. Rename the existing `manifest.json` as `Central-manifest.json` and then rename the `ClientAuth-manifest.json` to replace the original `manifest.json`.
 
 ## Mechanics
 The `CyberArk-ClientAuth-CentralCredentialProvider` PAM Provider Type communicates to a CyberArk instance using HTTPS. REST API calls are made to the host and site specified.
@@ -79,3 +96,4 @@ The `CyberArk-ClientAuth-CentralCredentialProvider` PAM Provider Type was introd
 ### Migrating from plugin version 2.2.x to 2.3.0 or later
 - Update to the latest PAM plugin version.
 - Run the [update SQL script](https://github.com/Keyfactor/cyberark-credentialprovider-pam/blob/main/scripts/client_auth_add_pfx_file_path_pam_parameter.sql) against the Keyfactor Command database to add the new `PfxFilePath` initialization parameter to the existing PAM type.
+
