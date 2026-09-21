@@ -17,9 +17,6 @@ using cyberark_credentialprovider_pam_tests.Fakes;
 using Keyfactor.Extensions.Pam.CyberArk;
 using Keyfactor.Extensions.Pam.CyberArk.Clients;
 using Keyfactor.Extensions.Pam.CyberArk.Exceptions;
-using MartinCostello.Logging.XUnit;
-using Microsoft.Extensions.Logging;
-using Moq;
 using Xunit.Abstractions;
 
 namespace cyberark_credentialprovider_pam_tests.Providers;
@@ -31,10 +28,7 @@ public class CentralCredentialProviderPAMTests : BaseCredentialProviderPAMTest
     
     public CentralCredentialProviderPAMTests(ITestOutputHelper output)
     {
-        var loggerFactory = LoggerFactory.Create(builder =>
-            builder.AddProvider(new XUnitLoggerProvider(output, new XUnitLoggerOptions()))
-                .SetMinimumLevel(LogLevel.Trace));
-        var logger = loggerFactory.CreateLogger<CentralCredentialProviderPAMTests>();
+        var logger = BuildLogger<CentralCredentialProviderPAM>(output);
         
         _testHttpMessageHandler = new TestHttpMessageHandler();
         var httpClient = new CyberArkVaultHttpClient(logger, _testHttpMessageHandler);
@@ -78,7 +72,7 @@ public class CentralCredentialProviderPAMTests : BaseCredentialProviderPAMTest
         // Arrange
         var initializationInfo = CreateInitializationInfo();
         var instanceParams = CreateInstanceParams();
-        var expectedMessage = $"Required field {keyToRemove} was missing a value or was not defined as expected in dictionary.";
+        var expectedMessage = $"Required initialization info field {keyToRemove} was missing a value or was not defined as expected in dictionary.";
 
         // Act & Assert - Scenario 1: Key is missing from dictionary
         initializationInfo.Remove(keyToRemove);
@@ -102,7 +96,7 @@ public class CentralCredentialProviderPAMTests : BaseCredentialProviderPAMTest
         // Arrange
         var initializationInfo = CreateInitializationInfo();
         var instanceParams = CreateInstanceParams();
-        var expectedMessage = $"Required field {keyToRemove} was missing a value or was not defined as expected in dictionary.";
+        var expectedMessage = $"Required instance parameter field {keyToRemove} was missing a value or was not defined as expected in dictionary.";
         
         // Act & Assert - Scenario 1: Key is missing from dictionary
         instanceParams.Remove(keyToRemove);

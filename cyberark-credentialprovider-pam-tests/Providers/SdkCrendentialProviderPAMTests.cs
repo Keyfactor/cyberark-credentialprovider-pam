@@ -41,7 +41,7 @@ public class SdkCrendentialProviderPAMTests : BaseCredentialProviderPAMTest
         // Arrange
         var initializationInfo = CreateInitializationInfo();
         var instanceParams = CreateInstanceParams();
-        var expectedMessage = $"Required field {keyToRemove} was missing a value or was not defined as expected in dictionary.";
+        var expectedMessage = $"Required initialization info field {keyToRemove} was missing a value or was not defined as expected in dictionary.";
         
         
         // Act & Assert - Scenario 1: Key is missing from dictionary
@@ -66,7 +66,7 @@ public class SdkCrendentialProviderPAMTests : BaseCredentialProviderPAMTest
         // Arrange
         var initializationInfo = CreateInitializationInfo();
         var instanceParams = CreateInstanceParams();
-        var expectedMessage = $"Required field {keyToRemove} was missing a value or was not defined as expected in dictionary.";
+        var expectedMessage = $"Required instance parameter field {keyToRemove} was missing a value or was not defined as expected in dictionary.";
         
         // Act & Assert - Scenario 1: Key is missing from dictionary
         instanceParams.Remove(keyToRemove);
