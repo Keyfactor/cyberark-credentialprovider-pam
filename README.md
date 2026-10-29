@@ -12,12 +12,20 @@
 
 <p align="center">
   <!-- TOC -->
-  <a href="#support">
-    <b>Support</b>
+  <a href="#overview">
+    <b>Overview</b>
   </a>
   ·
-  <a href="#getting-started">
+  <a href="#installation">
     <b>Installation</b>
+  </a>
+  ·
+  <a href="#usage">
+    <b>Usage</b>
+  </a>
+  ·
+  <a href="#support">
+    <b>Support</b>
   </a>
   ·
   <a href="#license">
@@ -43,58 +51,59 @@ Please refer to the below sections for the different considerations required for
 > If you are using a different PAM type, please refer to the PAM extension-specific documentation under the [docs](./docs) directory within the `Install PAM provider on a Universal Orchestrator Host (Remote) - manifest.json` section for instructions on the manifest.json changes for Universal Orchestrator installations for each PAM extension type.
 >
 > Quick Links:
-> 
+>
 > - [CyberArk-ClientAuth-CentralCredentialProvider manifest.json instructions](./docs/cyberark-clientauth-centralcredentialprovider.md#install-pam-provider-on-a-universal-orchestrator-host-remote---manifestjson)
-> 
+>
 > - [CyberArk-SdkCredentialProvider manifest.json instructions](./docs/cyberark-sdkcredentialprovider.md#install-pam-provider-on-a-universal-orchestrator-host-remote---manifestjson)
 
 #### Compatibility
 This release was tested against CyberArk version 12.6.
 Using this on a Universal Orchestrator requires UO version 10.1 or greater.
 
-## Support
-The CyberArk PAM Provider is supported by Keyfactor for Keyfactor customers. If you have a support issue, please open a support ticket via the Keyfactor Support Portal at https://support.keyfactor.com.
-
-> To report a problem or suggest a new feature, use the **[Issues](../../issues)** tab. If you want to contribute actual bug fixes or proposed enhancements, use the **[Pull requests](../../pulls)** tab.
-
 ## Getting Started
 
 The CyberArk PAM Provider is used by Command to resolve PAM-eligible credentials for Universal Orchestrator extensions and for accessing Certificate Authorities. When configured, Command will use the CyberArk PAM Provider to retrieve credentials needed to communicate with the target system. There are two ways to install the CyberArk PAM Provider, and you may elect to use one or both methods:
 
-1. **Locally on the Keyfactor Command server**: PAM credential resolution via the CyberArk PAM Provider will occur on the Keyfactor Command server each time an elegible credential is needed.
-2. **Remotely On Universal Orchestrators**: When Jobs are dispatched to Universal Orchestrators, the associated Certificate Store extension assembly will use the CyberArk PAM Provider to resolve eligible PAM credentials.
+1. **Locally on the Keyfactor Command server**: PAM credential resolution via the CyberArk PAM Provider will occur on the Keyfactor Command server each time an eligible credential is needed.
+2. **Remotely on Universal Orchestrators**: When Jobs are dispatched to Universal Orchestrators, the associated Certificate Store extension assembly will use the CyberArk PAM Provider to resolve eligible PAM credentials.
 
 Before proceeding with installation, you should consider which pattern is best for your requirements and use case.
 
 ### Installation
 
 > [!IMPORTANT]
-> For the most up-to-date and complete documentation on how to install a PAM provider extension, please visit our [product documentation](https://software.keyfactor.com/Core-OnPrem/Current/Content/ReferenceGuide/Preparing%20Third%20Party%20PAM%20Providers%20to%20Work%20with.htm?Highlight=pam%20provider#InstallingCustomPAMProviderExtensions)
-
+> For the most up-to-date and complete documentation on how to install a PAM provider extension, please visit our [product documentation](https://software.keyfactor.com/Core-OnPrem/Current/Content/ReferenceGuide/Preparing%20Third%20Party%20PAM%20Providers%20to%20Work%20with.htm?Highlight=pam%20provider#InstallingCustomPAMProviderExtensions).
 
 To install CyberArk PAM Provider, it is recommended you install [kfutil](https://github.com/Keyfactor/kfutil). `kfutil` is a command-line tool that simplifies the process of creating PAM Types in Keyfactor Command.
 
+The CyberArk PAM Provider implements three PAM Types. Depending on your use case, you may elect to install one, or all of these PAM Types. An overview for each type is linked below:
 
-The CyberArk PAM Provider implements 3 PAM Types. Depending on your use case, you may elect to install one, or all of these PAM Types. An overview for each type is linked below:
 * [CyberArk-CentralCredentialProvider](docs/cyberark-centralcredentialprovider.md)
 * [CyberArk-ClientAuth-CentralCredentialProvider](docs/cyberark-clientauth-centralcredentialprovider.md)
 * [CyberArk-SdkCredentialProvider](docs/cyberark-sdkcredentialprovider.md)
 
 <details><summary>CyberArk-CentralCredentialProvider</summary>
 
+#### Overview
+
+The CyberArk Central Credential Provider (CCP) communicates with CyberArk over HTTPS with [REST API calls](https://docs.cyberark.com/credential-providers/latest/en/content/ccp/calling-the-web-service-using-rest.htm).
+
+It does not require a local instance of the CyberArk Credential Provider to be installed on the machine using the PAM Provider, however this PAM type **only supports anonymous authentication** to the Central Credential Provider API. Client authentication to Central Credential Provider is supported with the `CyberArk-ClientAuth-CentralCredentialProvider` PAM type.
+
 #### Requirements
+
    In order for the Central Credential Provider to work, the Safe / Secret being accessed need to be available to the Provider that the CyberArk server is using, and the Application ID needs to be usable from an external requestor. This may require adding IP address or other rules.
-   
+
    Certificate Authentication is not currently supported and needs to be disabled. This may necessitate creating a Site that allows HTTPS requests but does not require a Client Certificate to authenticate. By default the site `AIMWebService` may require a Client Certificate, which would need to be edited or have another site created.
-   
+
    To read secrets stored in a CyberArk Vault safe, the Application ID must have at least the following permissions on the safe:
    - Monitor Safe
    - Retrieve files from Safe
 
 #### Create PAM type in Keyfactor Command
 
-
 ##### Using `kfutil`
+
 Create the required PAM Types in the connected Command platform.
 
 ```shell
@@ -103,9 +112,11 @@ kfutil pam-types create -r cyberark-credentialprovider-pam -n CyberArk-CentralCr
 ```
 
 ##### Using the API
-For full API docs please visit our [product documentation](https://software.keyfactor.com/Core-OnPrem/Current/Content/WebAPI/KeyfactorAPI/PAMProvidersPOSTTypes.htm?Highlight=pam%20type)
 
-Below is the payload to `POST` to the Keyfactor Command API
+For full API docs please visit our [product documentation](https://software.keyfactor.com/Core-OnPrem/Current/Content/WebAPI/KeyfactorAPI/PAMProvidersPOSTTypes.htm?Highlight=pam%20type).
+
+Below is the payload to `POST` to the Keyfactor Command API:
+
 ```json
 {
   "Name": "CyberArk-CentralCredentialProvider",
@@ -156,117 +167,38 @@ Below is the payload to `POST` to the Keyfactor Command API
 }
 ```
 
-#### Install PAM provider on Keyfactor Command Host (Local)
-
-
-1. On the server that hosts Keyfactor Command, download and unzip the latest release of the CyberArk PAM Provider from the [Releases](../../releases) page.
-
-2. Copy the assemblies to the appropriate directories on the Keyfactor Command server:
-
-    <details><summary>Keyfactor Command 11+</summary>
-
-    1. Copy the unzipped assemblies to each of the following directories:
-
-        * `C:\Program Files\Keyfactor\Keyfactor Platform\WebAgentServices\Extensions\cyberark-credentialprovider-pam`
-        * `C:\Program Files\Keyfactor\Keyfactor Platform\WebConsole\Extensions\cyberark-credentialprovider-pam`
-        * `C:\Program Files\Keyfactor\Keyfactor Platform\KeyfactorAPI\Extensions\cyberark-credentialprovider-pam`
-
-    </details>
-
-    <details><summary>Keyfactor Command 10</summary>
-
-    1. Copy the assemblies to each of the following directories:
-
-        * `C:\Program Files\Keyfactor\Keyfactor Platform\WebAgentServices\bin\cyberark-credentialprovider-pam`
-        * `C:\Program Files\Keyfactor\Keyfactor Platform\KeyfactorAPI\bin\cyberark-credentialprovider-pam`
-        * `C:\Program Files\Keyfactor\Keyfactor Platform\WebConsole\bin\cyberark-credentialprovider-pam`
-        * `C:\Program Files\Keyfactor\Keyfactor Platform\Service\cyberark-credentialprovider-pam`
-
-    2. Open a text editor on the Keyfactor Command server as an administrator and open the `web.config` file located in the `WebAgentServices` directory.
-
-    3. In the `web.config` file, locate the `<container> </container>` section and add the following registration:
-
-        ```xml
-        <container>
-            ...
-            <!--The following are PAM Provider registrations. Uncomment them to use them in the Keyfactor Product:-->
-
-            <!--Add the following line exactly to register the PAM Provider-->
-            <register type="IPAMProvider" mapTo="Keyfactor.Extensions.Pam.CyberArk.CentralCredentialProviderPAM, Keyfactor.Command.PAMProviders" name="CyberArk-CentralCredentialProvider" />
-        </container>
-        ```
-
-    4. Repeat steps 2 and 3 for each of the directories listed in step 1. The configuration files are located in the following paths by default:
-
-        * `C:\Program Files\Keyfactor\Keyfactor Platform\WebAgentServices\web.config`
-        * `C:\Program Files\Keyfactor\Keyfactor Platform\KeyfactorAPI\web.config`
-        * `C:\Program Files\Keyfactor\Keyfactor Platform\WebConsole\web.config`
-        * `C:\Program Files\Keyfactor\Keyfactor Platform\Service\CMSTimerService.exe.config`
-
-    </details>
-
-3. Restart the Keyfactor Command services (`iisreset`).
-
-#### Install PAM provider on a Universal Orchestrator Host (Remote)
-
-
-1. Install the CyberArk PAM Provider assemblies.
-
-    * **Using kfutil**: On the server that hosts the Universal Orchestrator, run the following command:
-
-        ```shell
-        # Windows Server
-        kfutil orchestrator extension -e cyberark-credentialprovider-pam@latest --out "C:\Program Files\Keyfactor\Keyfactor Orchestrator\extensions"
-
-        # Linux
-        kfutil orchestrator extension -e cyberark-credentialprovider-pam@latest --out "/opt/keyfactor/orchestrator/extensions"
-        ```
-
-    * **Manually**: Download the latest release of the CyberArk PAM Provider from the [Releases](../../releases) page. Extract the contents of the archive to:
-
-        * **Windows Server**: `C:\Program Files\Keyfactor\Keyfactor Orchestrator\extensions\cyberark-credentialprovider-pam`
-        * **Linux**: `/opt/keyfactor/orchestrator/extensions/cyberark-credentialprovider-pam`
-
-2. Included in the release is a `manifest.json` file that contains the following object:
-    ```json
-    {
-      "Keyfactor:PAMProviders:CyberArk-CentralCredentialProvider:InitializationInfo": {
-        "AppId": "<AppId>",
-        "Host": "<Host>",
-        "Site": "<Site>"
-      }
-    }
-    ```
-
-    Populate the fields in this object with credentials and configuration data collected in the [requirements](docs/cyberark-centralcredentialprovider.md#requirements) section.
-
-3. Restart the Universal Orchestrator service.
-
 </details>
 
 <details><summary>CyberArk-ClientAuth-CentralCredentialProvider</summary>
 
+#### Overview
+
+The CyberArk Client-Auth Central Credential Provider (CCP) communicates with CyberArk over HTTPS with [REST API calls](https://docs.cyberark.com/credential-providers/latest/en/content/ccp/calling-the-web-service-using-rest.htm), using client certificate authentication for secure communication.
+
+It does not require a local instance of the CyberArk Credential Provider to be installed on the machine using the PAM Provider.
+
 #### Requirements
+
    > [!IMPORTANT]
-   > 
+   >
    > If using this PAM type, you will need to replace the `manifest.json` file with the contents of `ClientAuth-manifest.json`. Please see the `Install PAM provider on a Universal Orchestrator Host (Remote) - manifest.json` section below for more details.
-   
+
    In order for the Client-Auth Central Credential Provider to work, the Safe / Secret being accessed need to be available to the Provider that the CyberArk server is using, and the Application ID needs to be usable from an external requestor. This may require adding IP address or other rules.
-   
+
    In order for the integration to take advantage of Client Certificate auth, please ensure that HTTPS is enabled and configured to require a Client Certificate. By default the site `AIMWebService` may be configured to require a Client Certificate.
-   
+
    To read secrets stored in a CyberArk Vault safe, the Application ID must have at least the following permissions on the safe:
    - Monitor Safe
    - Retrieve files from Safe
-   
+
    ### Install PAM provider on a Universal Orchestrator Host (Remote) - manifest.json
-   
+
    The default `manifest.json` included with the extension download needs to be replaced by the included `ClientAuth-manifest.json`. Rename the existing `manifest.json` as `Central-manifest.json` and then rename the `ClientAuth-manifest.json` to replace the original `manifest.json`.
 
 #### Create PAM type in Keyfactor Command
 
-
 ##### Using `kfutil`
+
 Create the required PAM Types in the connected Command platform.
 
 ```shell
@@ -275,9 +207,11 @@ kfutil pam-types create -r cyberark-credentialprovider-pam -n CyberArk-ClientAut
 ```
 
 ##### Using the API
-For full API docs please visit our [product documentation](https://software.keyfactor.com/Core-OnPrem/Current/Content/WebAPI/KeyfactorAPI/PAMProvidersPOSTTypes.htm?Highlight=pam%20type)
 
-Below is the payload to `POST` to the Keyfactor Command API
+For full API docs please visit our [product documentation](https://software.keyfactor.com/Core-OnPrem/Current/Content/WebAPI/KeyfactorAPI/PAMProvidersPOSTTypes.htm?Highlight=pam%20type).
+
+Below is the payload to `POST` to the Keyfactor Command API:
+
 ```json
 {
   "Name": "CyberArk-ClientAuth-CentralCredentialProvider",
@@ -349,129 +283,46 @@ Below is the payload to `POST` to the Keyfactor Command API
 }
 ```
 
-#### Install PAM provider on Keyfactor Command Host (Local)
-
-
-1. On the server that hosts Keyfactor Command, download and unzip the latest release of the CyberArk PAM Provider from the [Releases](../../releases) page.
-
-2. Copy the assemblies to the appropriate directories on the Keyfactor Command server:
-
-    <details><summary>Keyfactor Command 11+</summary>
-
-    1. Copy the unzipped assemblies to each of the following directories:
-
-        * `C:\Program Files\Keyfactor\Keyfactor Platform\WebAgentServices\Extensions\cyberark-credentialprovider-pam`
-        * `C:\Program Files\Keyfactor\Keyfactor Platform\WebConsole\Extensions\cyberark-credentialprovider-pam`
-        * `C:\Program Files\Keyfactor\Keyfactor Platform\KeyfactorAPI\Extensions\cyberark-credentialprovider-pam`
-
-    </details>
-
-    <details><summary>Keyfactor Command 10</summary>
-
-    1. Copy the assemblies to each of the following directories:
-
-        * `C:\Program Files\Keyfactor\Keyfactor Platform\WebAgentServices\bin\cyberark-credentialprovider-pam`
-        * `C:\Program Files\Keyfactor\Keyfactor Platform\KeyfactorAPI\bin\cyberark-credentialprovider-pam`
-        * `C:\Program Files\Keyfactor\Keyfactor Platform\WebConsole\bin\cyberark-credentialprovider-pam`
-        * `C:\Program Files\Keyfactor\Keyfactor Platform\Service\cyberark-credentialprovider-pam`
-
-    2. Open a text editor on the Keyfactor Command server as an administrator and open the `web.config` file located in the `WebAgentServices` directory.
-
-    3. In the `web.config` file, locate the `<container> </container>` section and add the following registration:
-
-        ```xml
-        <container>
-            ...
-            <!--The following are PAM Provider registrations. Uncomment them to use them in the Keyfactor Product:-->
-
-            <!--Add the following line exactly to register the PAM Provider-->
-            <register type="IPAMProvider" mapTo="Keyfactor.Extensions.Pam.CyberArk.CentralCredentialProviderPAM, Keyfactor.Command.PAMProviders" name="CyberArk-ClientAuth-CentralCredentialProvider" />
-        </container>
-        ```
-
-    4. Repeat steps 2 and 3 for each of the directories listed in step 1. The configuration files are located in the following paths by default:
-
-        * `C:\Program Files\Keyfactor\Keyfactor Platform\WebAgentServices\web.config`
-        * `C:\Program Files\Keyfactor\Keyfactor Platform\KeyfactorAPI\web.config`
-        * `C:\Program Files\Keyfactor\Keyfactor Platform\WebConsole\web.config`
-        * `C:\Program Files\Keyfactor\Keyfactor Platform\Service\CMSTimerService.exe.config`
-
-    </details>
-
-3. Restart the Keyfactor Command services (`iisreset`).
-
-#### Install PAM provider on a Universal Orchestrator Host (Remote)
-
-
-1. Install the CyberArk PAM Provider assemblies.
-
-    * **Using kfutil**: On the server that hosts the Universal Orchestrator, run the following command:
-
-        ```shell
-        # Windows Server
-        kfutil orchestrator extension -e cyberark-credentialprovider-pam@latest --out "C:\Program Files\Keyfactor\Keyfactor Orchestrator\extensions"
-
-        # Linux
-        kfutil orchestrator extension -e cyberark-credentialprovider-pam@latest --out "/opt/keyfactor/orchestrator/extensions"
-        ```
-
-    * **Manually**: Download the latest release of the CyberArk PAM Provider from the [Releases](../../releases) page. Extract the contents of the archive to:
-
-        * **Windows Server**: `C:\Program Files\Keyfactor\Keyfactor Orchestrator\extensions\cyberark-credentialprovider-pam`
-        * **Linux**: `/opt/keyfactor/orchestrator/extensions/cyberark-credentialprovider-pam`
-
-2. Included in the release is a `manifest.json` file that contains the following object:
-    ```json
-    {
-      "Keyfactor:PAMProviders:CyberArk-ClientAuth-CentralCredentialProvider:InitializationInfo": {
-        "AppId": "<AppId>",
-        "Host": "<Host>",
-        "Site": "<Site>",
-        "PfxBase64": "<PfxBase64>",
-        "PfxFilePath": "<PfxFilePath>",
-        "PfxPassword": "<PfxPassword>"
-      }
-    }
-    ```
-
-    Populate the fields in this object with credentials and configuration data collected in the [requirements](docs/cyberark-clientauth-centralcredentialprovider.md#requirements) section.
-
-3. Restart the Universal Orchestrator service.
-
 </details>
 
 <details><summary>CyberArk-SdkCredentialProvider</summary>
 
+#### Overview
+
+The CyberArk SDK Credential Provider uses the CyberArk SDK in order to communicate with a locally installed [Credential Provider](https://docs.cyberark.com/credential-providers/latest/en/content/cp%20and%20ascp/lp_cp.htm).
+When the Credential Provider is installed locally, authentication needs to be configured correctly for the provider to communicate with a CyberArk instance over their proprietary protocol.
+
 #### Requirements
+
    > [!IMPORTANT]
-   > 
+   >
    > If using this PAM type, you will need to replace the `manifest.json` file with the contents of `SDK-manifest.json`. Please see the `Install PAM provider on a Universal Orchestrator Host (Remote) - manifest.json` section below for more details.
-   
+
    After installing the Credential Provider, copy the `NetStandardPasswordSDK.dll` assembly from the install location into the PAM Provider install location. This dll should be stored in the same directory as `cyberark-credentialprovider-pam.dll` to be properly loaded. The name `NetStandardPasswordSDK.dll` is case-sensitive, so make sure the name is copied to the directory as `NetStandardPasswordSDK.dll`.
-   
+
    After registering the Credential Provider during install, make sure the Provider for the machine has been granted permission to access the Safe, as well as the Application ID that will be used.
-   
+
    To read secrets stored in a CyberArk Vault safe, the Partner must have at least the following permissions on the safe:
    - Monitor Safe
    - Retrieve files from Safe
-   
+
    ### Install PAM provider on a Universal Orchestrator Host (Remote) - manifest.json
-   
+
    The default `manifest.json` included with the extension download needs to be replaced by the included `SDK-manifest.json`. Rename the existing `manifest.json` as `Central-manifest.json` and then rename the `SDK-manifest.json` to replace the original `manifest.json`.
-   
+
    ### IMPORTANT NOTE FOR LINUX INSTALLATIONS
-   
-   If you have installed the Credential Provider on a Linux instance and run this PAM extension within a [Universal Orchestrator as a Linux service](https://software.keyfactor.com/Core-OnPrem/Current/Content/InstallingAgents/NetCoreOrchestrator/InstalltheOrchestratorLinux.htm), you may run into issues communicating with the Credential Provider service and receive an `ENCPR019E` error code when the PAM instance tries to retrieve a credential. 
-   
+
+   If you have installed the Credential Provider on a Linux instance and run this PAM extension within a [Universal Orchestrator as a Linux service](https://software.keyfactor.com/Core-OnPrem/Current/Content/InstallingAgents/NetCoreOrchestrator/InstalltheOrchestratorLinux.htm), you may run into issues communicating with the Credential Provider service and receive an `ENCPR019E` error code when the PAM instance tries to retrieve a credential.
+
    By default, the Universal Orchestrator Linux service has [PrivateTmp](https://www.redhat.com/en/blog/new-red-hat-enterprise-linux-7-security-feature-privatetmp) enabled, which creates a separate, isolated `/tmp` directory for the service. The CyberArk Credential Provider creates a named pipe in the `/tmp` directory to communicate with other applications, so when PrivateTmp is enabled, the PAM instance cannot access this pipe to communicate with the Credential Provider. To resolve this issue, you can disable PrivateTmp for the Universal Orchestrator Linux service by creating an override file with the command `sudo systemctl edit keyfactor-orchestrator-default.service` and adding the following lines:
-   
+
    ```
    [Service]
    PrivateTmp=false
    ```
-   
+
    and then run the following commands to restart the service daemon and the Universal Orchestrator service:
-   
+
    ```bash
    sudo systemctl daemon-reload
    sudo systemctl restart keyfactor-orchestrator-default.service
@@ -479,8 +330,8 @@ Below is the payload to `POST` to the Keyfactor Command API
 
 #### Create PAM type in Keyfactor Command
 
-
 ##### Using `kfutil`
+
 Create the required PAM Types in the connected Command platform.
 
 ```shell
@@ -489,9 +340,11 @@ kfutil pam-types create -r cyberark-credentialprovider-pam -n CyberArk-SdkCreden
 ```
 
 ##### Using the API
-For full API docs please visit our [product documentation](https://software.keyfactor.com/Core-OnPrem/Current/Content/WebAPI/KeyfactorAPI/PAMProvidersPOSTTypes.htm?Highlight=pam%20type)
 
-Below is the payload to `POST` to the Keyfactor Command API
+For full API docs please visit our [product documentation](https://software.keyfactor.com/Core-OnPrem/Current/Content/WebAPI/KeyfactorAPI/PAMProvidersPOSTTypes.htm?Highlight=pam%20type).
+
+Below is the payload to `POST` to the Keyfactor Command API:
+
 ```json
 {
   "Name": "CyberArk-SdkCredentialProvider",
@@ -528,8 +381,9 @@ Below is the payload to `POST` to the Keyfactor Command API
 }
 ```
 
-#### Install PAM provider on Keyfactor Command Host (Local)
+</details>
 
+#### Install PAM provider on Keyfactor Command Host (Local)
 
 1. On the server that hosts Keyfactor Command, download and unzip the latest release of the CyberArk PAM Provider from the [Releases](../../releases) page.
 
@@ -556,15 +410,17 @@ Below is the payload to `POST` to the Keyfactor Command API
 
     2. Open a text editor on the Keyfactor Command server as an administrator and open the `web.config` file located in the `WebAgentServices` directory.
 
-    3. In the `web.config` file, locate the `<container> </container>` section and add the following registration:
+    3. In the `web.config` file, locate the `<container> </container>` section and add the following registrations:
 
         ```xml
         <container>
             ...
             <!--The following are PAM Provider registrations. Uncomment them to use them in the Keyfactor Product:-->
 
-            <!--Add the following line exactly to register the PAM Provider-->
-            <register type="IPAMProvider" mapTo="Keyfactor.Extensions.Pam.CyberArk.CentralCredentialProviderPAM, Keyfactor.Command.PAMProviders" name="CyberArk-SdkCredentialProvider" />
+            <!--Add the following lines exactly to register the PAM Providers, one per PAM type-->
+            <register type="IPAMProvider" mapTo="Keyfactor.Extensions.Pam.CyberArk.CentralCredentialProviderPAM, cyberark-credentialprovider-pam" name="CyberArk-CentralCredentialProvider" />
+            <register type="IPAMProvider" mapTo="Keyfactor.Extensions.Pam.CyberArk.CentralCredentialProviderPAM, cyberark-credentialprovider-pam" name="CyberArk-ClientAuth-CentralCredentialProvider" />
+            <register type="IPAMProvider" mapTo="Keyfactor.Extensions.Pam.CyberArk.CentralCredentialProviderPAM, cyberark-credentialprovider-pam" name="CyberArk-SdkCredentialProvider" />
         </container>
         ```
 
@@ -580,7 +436,6 @@ Below is the payload to `POST` to the Keyfactor Command API
 3. Restart the Keyfactor Command services (`iisreset`).
 
 #### Install PAM provider on a Universal Orchestrator Host (Remote)
-
 
 1. Install the CyberArk PAM Provider assemblies.
 
@@ -602,48 +457,78 @@ Below is the payload to `POST` to the Keyfactor Command API
 2. Included in the release is a `manifest.json` file that contains the following object:
     ```json
     {
+      "Keyfactor:PAMProviders:CyberArk-CentralCredentialProvider:InitializationInfo": {
+        "AppId": "<AppId>",
+        "Host": "<Host>",
+        "Site": "<Site>"
+      },
+      "Keyfactor:PAMProviders:CyberArk-ClientAuth-CentralCredentialProvider:InitializationInfo": {
+        "AppId": "<AppId>",
+        "Host": "<Host>",
+        "Site": "<Site>",
+        "PfxBase64": "<PfxBase64>",
+        "PfxFilePath": "<PfxFilePath>",
+        "PfxPassword": "<PfxPassword>"
+      },
       "Keyfactor:PAMProviders:CyberArk-SdkCredentialProvider:InitializationInfo": {
         "AppId": "<AppId>"
       }
     }
     ```
 
-    Populate the fields in this object with credentials and configuration data collected in the [requirements](docs/cyberark-sdkcredentialprovider.md#requirements) section.
+    Populate the fields in this object with credentials and configuration data collected in the requirements section of each PAM type ([CyberArk-CentralCredentialProvider](docs/cyberark-centralcredentialprovider.md#requirements), [CyberArk-ClientAuth-CentralCredentialProvider](docs/cyberark-clientauth-centralcredentialprovider.md#requirements), [CyberArk-SdkCredentialProvider](docs/cyberark-sdkcredentialprovider.md#requirements)).
 
 3. Restart the Universal Orchestrator service.
 
-</details>
-
 ### Usage
-
-<details><summary>CyberArk-CentralCredentialProvider</summary>
 
 #### From Keyfactor Command Host (Local)
 
 ##### Define a PAM provider in Command
-1. In the Keyfactor Command Portal, hover over the ⚙️  (settings) icon in the top right corner of the screen and select **Priviledged Access Management**.
 
-2. Select the **Add** button to create a new PAM provider. Click the dropdown for **Provider Type** and select **CyberArk-CentralCredentialProvider**.
+1. In the Keyfactor Command Portal, hover over the ⚙️  (settings) icon in the top right corner of the screen and select **Privileged Access Management**.
 
-> [!IMPORTANT]
-> If you're running Keyfactor Command 11+, make sure `Remote Provider` is unchecked.
+2. Select the **Add** button to create a new PAM provider. Click the dropdown for **Provider Type** and select the PAM type you want to use: **CyberArk-CentralCredentialProvider**, **CyberArk-ClientAuth-CentralCredentialProvider**, **CyberArk-SdkCredentialProvider**.
 
-3. Populate the fields with the necessary information collected in the [requirements](docs/cyberark-centralcredentialprovider.md#requirements) section:
+   > [!IMPORTANT]
+   > If you're running Keyfactor Command 11+, make sure `Remote Provider` is unchecked.
 
-| Initialization parameter | Display Name | Description |
-| --- | --- | --- |
-| AppId | Application ID | The Application ID with access set up for the Safe used to identify and authenticate requests. |
-| Host | CyberArk Host and Port | The hostname (IP address or domain name) and (optionally) port. It should take the format: my.cyberark.instance:404 (note: no https:// included). |
-| Site | CyberArk API Site | By default, AIMWebService is the site name, but may be deployed to another site name. |
+3. Populate the fields with the necessary information collected in the requirements section of the PAM type you selected, using the table for that type:
 
+   **CyberArk-CentralCredentialProvider** ([requirements](docs/cyberark-centralcredentialprovider.md#requirements))
+
+   | Initialization parameter | Display Name | Description |
+   | --- | --- | --- |
+   | AppId | Application ID | The Application ID with access set up for the Safe used to identify and authenticate requests. |
+   | Host | CyberArk Host and Port | The hostname (IP address or domain name) and (optionally) port. It should take the format: my.cyberark.instance:404 (note: no https:// included). |
+   | Site | CyberArk API Site | By default, AIMWebService is the site name, but may be deployed to another site name. |
+
+   **CyberArk-ClientAuth-CentralCredentialProvider** ([requirements](docs/cyberark-clientauth-centralcredentialprovider.md#requirements))
+
+   | Initialization parameter | Display Name | Description |
+   | --- | --- | --- |
+   | AppId | Application ID | The Application ID with access set up for the Safe used to identify and authenticate requests. |
+   | Host | CyberArk Host and Port | The hostname (IP address or domain name) and (optionally) port. It should take the format: my.cyberark.instance:404 (note: no https:// included). |
+   | Site | CyberArk API Site | By default, AIMWebService is the site name, but may be deployed to another site name. |
+   | PfxBase64 | PFX Base64 | The Base64-encoded PFX certificate used for authentication. This is an alternative to providing a file path. If populated with empty spaces or 'none', it will be ignored and the provider will look for a file path instead. If both PfxBase64 and PfxFilePath are provided, PfxBase64 will take precedence. |
+   | PfxFilePath | PFX File Path | The relative or absolute file path to the PFX certificate used for authentication. This is an alternative to providing a Base64-encoded PFX. If populated with empty spaces or 'none', it will be ignored and the provider will look for a Base64-encoded PFX instead. If both PfxBase64 and PfxFilePath are provided, PfxBase64 will take precedence. |
+   | PfxPassword | PFX Password | The password for the PFX certificate used for authentication. |
+
+   **CyberArk-SdkCredentialProvider** ([requirements](docs/cyberark-sdkcredentialprovider.md#requirements))
+
+   | Initialization parameter | Display Name | Description |
+   | --- | --- | --- |
+   | AppId | Application ID | The Application ID with access set up for the Safe used to identify and authenticate requests. |
 
 4. Click **Save**. The PAM provider is now available for use in Keyfactor Command.
 
 ##### Using the PAM provider
 
-Now, when defining Certificate Stores (**Locations**->**Certificate Stores**), **CyberArk-CentralCredentialProvider** will be available as a PAM provider option. When defining new Certificate Stores, the secret parameter form will display tabs for **Load From Keyfactor Secrets** or **Load From PAM Provider**. 
+Now, when defining Certificate Stores (**Locations**->**Certificate Stores**), **CyberArk-CentralCredentialProvider**, **CyberArk-ClientAuth-CentralCredentialProvider**, **CyberArk-SdkCredentialProvider** will be available as a PAM provider option. When defining new Certificate Stores, the secret parameter form will display tabs for **Load From Keyfactor Secrets** or **Load From PAM Provider**.
 
-Select the **Load From PAM Provider** tab, choose the **CyberArk-CentralCredentialProvider** provider from the list of **Providers**, and populate the fields with the necessary information from the table below:
+Select the **Load From PAM Provider** tab, choose the provider you defined from the list of **Providers**, and populate the fields with the necessary information from the table for its PAM type below:
+
+**CyberArk-CentralCredentialProvider** ([requirements](docs/cyberark-centralcredentialprovider.md#requirements)), **CyberArk-ClientAuth-CentralCredentialProvider** ([requirements](docs/cyberark-clientauth-centralcredentialprovider.md#requirements)), **CyberArk-SdkCredentialProvider** ([requirements](docs/cyberark-sdkcredentialprovider.md#requirements))
 
 | Instance parameter | Display Name | Description |
 | --- | --- | --- |
@@ -651,23 +536,21 @@ Select the **Load From PAM Provider** tab, choose the **CyberArk-CentralCredenti
 | Folder | Folder | The folder path the credential lives in. If it is nested, use the backwards slash e.g. Root\Folder |
 | Object | Object | The name of the password object that has the credential. |
 
-
 #### From a Universal Orchestrator Host (Remote)
-
 
 <details><summary>Keyfactor Command 11+</summary>
 
 ##### Define a remote PAM provider in Command
 
-In Command 11 and greater, before using the CyberArk-CentralCredentialProvider PAM type, you must define a Remote PAM Provider in the Command portal.
+In Command 11 and greater, before using a PAM type (**CyberArk-CentralCredentialProvider**, **CyberArk-ClientAuth-CentralCredentialProvider**, **CyberArk-SdkCredentialProvider**), you must define a Remote PAM Provider in the Command portal.
 
-1. In the Keyfactor Command Portal, hover over the ⚙️  (settings) icon in the top right corner of the screen and select **Priviledged Access Management**.
+1. In the Keyfactor Command Portal, hover over the ⚙️  (settings) icon in the top right corner of the screen and select **Privileged Access Management**.
 
 2. Select the **Add** button to create a new PAM provider.
 
 3. Make sure that `Remote Provider` is checked.
 
-4. Click the dropdown for **Provider Type** and select **CyberArk-CentralCredentialProvider**. 
+4. Click the dropdown for **Provider Type** and select the PAM type you want to use: **CyberArk-CentralCredentialProvider**, **CyberArk-ClientAuth-CentralCredentialProvider**, **CyberArk-SdkCredentialProvider**.
 
 5. Give the provider a unique name.
 
@@ -675,9 +558,11 @@ In Command 11 and greater, before using the CyberArk-CentralCredentialProvider P
 
 ##### Using the PAM provider
 
-When defining Certificate Stores (**Locations**->**Certificate Stores**), **CyberArk-CentralCredentialProvider** can be used as a PAM provider. When defining a new Certificate Store, the secret parameter form will display tabs for **Load From Keyfactor Secrets** or **Load From PAM Provider**.
+When defining Certificate Stores (**Locations**->**Certificate Stores**), **CyberArk-CentralCredentialProvider**, **CyberArk-ClientAuth-CentralCredentialProvider**, **CyberArk-SdkCredentialProvider** can be used as a PAM provider. When defining a new Certificate Store, the secret parameter form will display tabs for **Load From Keyfactor Secrets** or **Load From PAM Provider**.
 
-Select the **Load From PAM Provider** tab, choose the **CyberArk-CentralCredentialProvider** provider from the list of **Providers**, and populate the fields with the necessary information from the table below:
+Select the **Load From PAM Provider** tab, choose the provider you defined from the list of **Providers**, and populate the fields with the necessary information from the table for its PAM type below:
+
+**CyberArk-CentralCredentialProvider** ([requirements](docs/cyberark-centralcredentialprovider.md#requirements)), **CyberArk-ClientAuth-CentralCredentialProvider** ([requirements](docs/cyberark-clientauth-centralcredentialprovider.md#requirements)), **CyberArk-SdkCredentialProvider** ([requirements](docs/cyberark-sdkcredentialprovider.md#requirements))
 
 | Instance parameter | Display Name | Description |
 | --- | --- | --- |
@@ -685,213 +570,133 @@ Select the **Load From PAM Provider** tab, choose the **CyberArk-CentralCredenti
 | Folder | Folder | The folder path the credential lives in. If it is nested, use the backwards slash e.g. Root\Folder |
 | Object | Object | The name of the password object that has the credential. |
 
-
 </details>
 
 <details><summary>Keyfactor Command 10</summary>
 
-When defining Certificate Stores (**Locations**->**Certificate Stores**), **CyberArk-CentralCredentialProvider** can be used as a PAM provider.
+When defining Certificate Stores (**Locations**->**Certificate Stores**), **CyberArk-CentralCredentialProvider**, **CyberArk-ClientAuth-CentralCredentialProvider**, **CyberArk-SdkCredentialProvider** can be used as a PAM provider.
 
 When entering Secret fields, select the **Load From Keyfactor Secrets** tab, and populate the **Secret Value** field with the following JSON object:
 
-```json
-{"Safe":"The name of the Safe the credential resides in.","Folder":"The folder path the credential lives in. If it is nested, use the backwards slash e.g. Root\\Folder","Object":"The name of the password object that has the credential."}
+**CyberArk-CentralCredentialProvider**, **CyberArk-ClientAuth-CentralCredentialProvider**, **CyberArk-SdkCredentialProvider**
 
+```json
+{
+  "Safe": "<Safe>",
+  "Folder": "<Folder>",
+  "Object": "<Object>"
+}
 ```
+
+Replace each `<placeholder>` with the value described for that instance parameter in the table above.
 
 > We recommend creating this JSON object in a text editor, and copying it into the Secret Value field.
 
 </details>
 
+<details><summary>CyberArk-CentralCredentialProvider</summary>
 
 > [!NOTE]
 > Additional information on CyberArk-CentralCredentialProvider can be found in the [supplemental documentation](docs/cyberark-centralcredentialprovider.md).
+
+#### Extension Mechanics
+
+The `CyberArk-CentralCredentialProvider` PAM Provider Type communicates to a CyberArk instance using HTTPS. REST API calls are made to the host and site specified.
+
+As this PAM type only supports anonymous authentication, the target Site on the CyberArk instance needs to be configured for anonymous access.
+
+Importantly, the way authentication and restriction works for requests with the Central Credential provider are determined by the Application ID used. Additional rules can be set in CyberArk to enact restrictions on where the request for an Application ID needs to come from.
+After the Application ID is approved, the Central Credential Provider passes calls through an internally specified Provider object in CyberArk to the Vault.
+
 </details>
 
 <details><summary>CyberArk-ClientAuth-CentralCredentialProvider</summary>
 
-#### From Keyfactor Command Host (Local)
-
-##### Define a PAM provider in Command
-1. In the Keyfactor Command Portal, hover over the ⚙️  (settings) icon in the top right corner of the screen and select **Priviledged Access Management**.
-
-2. Select the **Add** button to create a new PAM provider. Click the dropdown for **Provider Type** and select **CyberArk-ClientAuth-CentralCredentialProvider**.
-
-> [!IMPORTANT]
-> If you're running Keyfactor Command 11+, make sure `Remote Provider` is unchecked.
-
-3. Populate the fields with the necessary information collected in the [requirements](docs/cyberark-clientauth-centralcredentialprovider.md#requirements) section:
-
-| Initialization parameter | Display Name | Description |
-| --- | --- | --- |
-| AppId | Application ID | The Application ID with access set up for the Safe used to identify and authenticate requests. |
-| Host | CyberArk Host and Port | The hostname (IP address or domain name) and (optionally) port. It should take the format: my.cyberark.instance:404 (note: no https:// included). |
-| Site | CyberArk API Site | By default, AIMWebService is the site name, but may be deployed to another site name. |
-| PfxBase64 | PFX Base64 | The Base64-encoded PFX certificate used for authentication. This is an alternative to providing a file path. If populated with empty spaces or 'none', it will be ignored and the provider will look for a file path instead. If both PfxBase64 and PfxFilePath are provided, PfxBase64 will take precedence. |
-| PfxFilePath | PFX File Path | The relative or absolute file path to the PFX certificate used for authentication. This is an alternative to providing a Base64-encoded PFX. If populated with empty spaces or 'none', it will be ignored and the provider will look for a Base64-encoded PFX instead. If both PfxBase64 and PfxFilePath are provided, PfxBase64 will take precedence. |
-| PfxPassword | PFX Password | The password for the PFX certificate used for authentication. |
-
-
-4. Click **Save**. The PAM provider is now available for use in Keyfactor Command.
-
-##### Using the PAM provider
-
-Now, when defining Certificate Stores (**Locations**->**Certificate Stores**), **CyberArk-ClientAuth-CentralCredentialProvider** will be available as a PAM provider option. When defining new Certificate Stores, the secret parameter form will display tabs for **Load From Keyfactor Secrets** or **Load From PAM Provider**. 
-
-Select the **Load From PAM Provider** tab, choose the **CyberArk-ClientAuth-CentralCredentialProvider** provider from the list of **Providers**, and populate the fields with the necessary information from the table below:
-
-| Instance parameter | Display Name | Description |
-| --- | --- | --- |
-| Safe | Safe | The name of the Safe the credential resides in. |
-| Folder | Folder | The folder path the credential lives in. If it is nested, use the backwards slash e.g. Root\Folder |
-| Object | Object | The name of the password object that has the credential. |
-
-
-#### From a Universal Orchestrator Host (Remote)
-
-
-<details><summary>Keyfactor Command 11+</summary>
-
-##### Define a remote PAM provider in Command
-
-In Command 11 and greater, before using the CyberArk-ClientAuth-CentralCredentialProvider PAM type, you must define a Remote PAM Provider in the Command portal.
-
-1. In the Keyfactor Command Portal, hover over the ⚙️  (settings) icon in the top right corner of the screen and select **Priviledged Access Management**.
-
-2. Select the **Add** button to create a new PAM provider.
-
-3. Make sure that `Remote Provider` is checked.
-
-4. Click the dropdown for **Provider Type** and select **CyberArk-ClientAuth-CentralCredentialProvider**. 
-
-5. Give the provider a unique name.
-
-6. Click "Save".
-
-##### Using the PAM provider
-
-When defining Certificate Stores (**Locations**->**Certificate Stores**), **CyberArk-ClientAuth-CentralCredentialProvider** can be used as a PAM provider. When defining a new Certificate Store, the secret parameter form will display tabs for **Load From Keyfactor Secrets** or **Load From PAM Provider**.
-
-Select the **Load From PAM Provider** tab, choose the **CyberArk-ClientAuth-CentralCredentialProvider** provider from the list of **Providers**, and populate the fields with the necessary information from the table below:
-
-| Instance parameter | Display Name | Description |
-| --- | --- | --- |
-| Safe | Safe | The name of the Safe the credential resides in. |
-| Folder | Folder | The folder path the credential lives in. If it is nested, use the backwards slash e.g. Root\Folder |
-| Object | Object | The name of the password object that has the credential. |
-
-
-</details>
-
-<details><summary>Keyfactor Command 10</summary>
-
-When defining Certificate Stores (**Locations**->**Certificate Stores**), **CyberArk-ClientAuth-CentralCredentialProvider** can be used as a PAM provider.
-
-When entering Secret fields, select the **Load From Keyfactor Secrets** tab, and populate the **Secret Value** field with the following JSON object:
-
-```json
-{"Safe":"The name of the Safe the credential resides in.","Folder":"The folder path the credential lives in. If it is nested, use the backwards slash e.g. Root\\Folder","Object":"The name of the password object that has the credential."}
-
-```
-
-> We recommend creating this JSON object in a text editor, and copying it into the Secret Value field.
-
-</details>
-
-
 > [!NOTE]
 > Additional information on CyberArk-ClientAuth-CentralCredentialProvider can be found in the [supplemental documentation](docs/cyberark-clientauth-centralcredentialprovider.md).
+
+#### Extension Mechanics
+
+The `CyberArk-ClientAuth-CentralCredentialProvider` PAM Provider Type communicates to a CyberArk instance using HTTPS. REST API calls are made to the host and site specified.
+
+The Client Authentication certificate may be provided in one of two ways via the initialization parameters:
+
+- **PFX Base64** (`PfxBase64`): the PFX certificate encoded as a Base64 string.
+- **PFX File Path** (`PfxFilePath`): a relative or absolute path to a PFX file on the machine running the Universal Orchestrator. Relative paths are resolved against the working directory of the Orchestrator or Keyfactor Command service. **The account running the Orchestrator or Keyfactor Command service must have read access to the file.**
+
+If both are supplied, `PfxBase64` takes precedence and `PfxFilePath` is ignored. If either field is set to an empty value, whitespace, or the literal string `none`, it is treated as if it was not provided. If neither field resolves to a usable value, the PAM job will fail with an error.
+
+> [!WARNING]
+> If `PfxFilePath` is specified but the file cannot be read, the PAM job will fail. Common causes and their error messages:
+> - **File not found**: `Could not find file '/path/to/client.pfx'`
+> - **Permission denied**: `Access to the path '/path/to/client.pfx' is denied.`
+>
+> Ensure the file exists at the specified path and that the account running the Orchestrator or Keyfactor Command service has read access to it.
+
+The PFX password (`PfxPassword`) is always required regardless of which method is used to supply the certificate.
+
+To obtain the Base64 encoded PFX, you can encode your PFX file using the following commands (subject to your operating system):
+
+##### PowerShell
+
+```powershell
+$pfxBytes = Get-Content -Path "path\to\your\certificate.pfx" -Encoding Byte
+$pfxBase64 = [Convert]::ToBase64String($pfxBytes)
+Write-Output $pfxBase64
+```
+
+##### Bash
+
+```bash
+pfxBase64=$(base64 -i /path/to/your/certificate.pfx)
+echo $pfxBase64
+```
+
+Importantly, authorization in the Central Credential Provider is governed by the Application ID. The Application in CyberArk can be configured with authentication restrictions that control exactly which callers are permitted to use it. For client certificate authentication specifically, CyberArk supports restricting an Application to only accept requests authenticated with a certificate matching specific attributes — such as serial number, subject, or issuer. This means administrators can pin the Application to the specific certificate issued to the Keyfactor Orchestrator, preventing any other caller from accessing it even if they know the Application ID. See [Application authentication methods](https://docs.cyberark.com/credential-providers/14.2/en/content/cp%20and%20ascp/application-authentication-methods-general.htm#) in the CyberArk documentation for details on configuring these restrictions.
+
+After the Application ID is approved, the Central Credential Provider passes calls through an internally specified Provider object in CyberArk to the Vault.
+
+#### Migration Guide
+
+The `CyberArk-ClientAuth-CentralCredentialProvider` PAM Provider Type was introduced in version 2.2.0 of the CyberArk Credential Provider PAM plugin.
+
+##### Migrating from plugin version 2.1.x or earlier
+- Install the latest PAM plugin version.
+- Create `CyberArk-ClientAuth-CentralCredentialProvider` PAM type in Keyfactor Command as documented in the [README](https://github.com/Keyfactor/cyberark-credentialprovider-pam).
+- Follow the instructions in the `Requirements` and `Mechanics` sections above to configure the new PAM type.
+- If installing version 2.3.0 or later, also follow the steps in the [2.2.x to 2.3.0](#migrating-from-plugin-version-22x-to-230-or-later) section below.
+
+##### Migrating from plugin version 2.2.x to 2.3.0 or later
+- Update to the latest PAM plugin version.
+- Run the [update SQL script](https://github.com/Keyfactor/cyberark-credentialprovider-pam/blob/main/scripts/client_auth_add_pfx_file_path_pam_parameter.sql) against the Keyfactor Command database to add the new `PfxFilePath` initialization parameter to the existing PAM type.
+
 </details>
 
 <details><summary>CyberArk-SdkCredentialProvider</summary>
 
-#### From Keyfactor Command Host (Local)
-
-##### Define a PAM provider in Command
-1. In the Keyfactor Command Portal, hover over the ⚙️  (settings) icon in the top right corner of the screen and select **Priviledged Access Management**.
-
-2. Select the **Add** button to create a new PAM provider. Click the dropdown for **Provider Type** and select **CyberArk-SdkCredentialProvider**.
-
-> [!IMPORTANT]
-> If you're running Keyfactor Command 11+, make sure `Remote Provider` is unchecked.
-
-3. Populate the fields with the necessary information collected in the [requirements](docs/cyberark-sdkcredentialprovider.md#requirements) section:
-
-| Initialization parameter | Display Name | Description |
-| --- | --- | --- |
-| AppId | Application ID | The Application ID with access set up for the Safe used to identify and authenticate requests. |
-
-
-4. Click **Save**. The PAM provider is now available for use in Keyfactor Command.
-
-##### Using the PAM provider
-
-Now, when defining Certificate Stores (**Locations**->**Certificate Stores**), **CyberArk-SdkCredentialProvider** will be available as a PAM provider option. When defining new Certificate Stores, the secret parameter form will display tabs for **Load From Keyfactor Secrets** or **Load From PAM Provider**. 
-
-Select the **Load From PAM Provider** tab, choose the **CyberArk-SdkCredentialProvider** provider from the list of **Providers**, and populate the fields with the necessary information from the table below:
-
-| Instance parameter | Display Name | Description |
-| --- | --- | --- |
-| Safe | Safe | The name of the Safe the credential resides in. |
-| Folder | Folder | The folder path the credential lives in. If it is nested, use the backwards slash e.g. Root\Folder |
-| Object | Object | The name of the password object that has the credential. |
-
-
-#### From a Universal Orchestrator Host (Remote)
-
-
-<details><summary>Keyfactor Command 11+</summary>
-
-##### Define a remote PAM provider in Command
-
-In Command 11 and greater, before using the CyberArk-SdkCredentialProvider PAM type, you must define a Remote PAM Provider in the Command portal.
-
-1. In the Keyfactor Command Portal, hover over the ⚙️  (settings) icon in the top right corner of the screen and select **Priviledged Access Management**.
-
-2. Select the **Add** button to create a new PAM provider.
-
-3. Make sure that `Remote Provider` is checked.
-
-4. Click the dropdown for **Provider Type** and select **CyberArk-SdkCredentialProvider**. 
-
-5. Give the provider a unique name.
-
-6. Click "Save".
-
-##### Using the PAM provider
-
-When defining Certificate Stores (**Locations**->**Certificate Stores**), **CyberArk-SdkCredentialProvider** can be used as a PAM provider. When defining a new Certificate Store, the secret parameter form will display tabs for **Load From Keyfactor Secrets** or **Load From PAM Provider**.
-
-Select the **Load From PAM Provider** tab, choose the **CyberArk-SdkCredentialProvider** provider from the list of **Providers**, and populate the fields with the necessary information from the table below:
-
-| Instance parameter | Display Name | Description |
-| --- | --- | --- |
-| Safe | Safe | The name of the Safe the credential resides in. |
-| Folder | Folder | The folder path the credential lives in. If it is nested, use the backwards slash e.g. Root\Folder |
-| Object | Object | The name of the password object that has the credential. |
-
-
-</details>
-
-<details><summary>Keyfactor Command 10</summary>
-
-When defining Certificate Stores (**Locations**->**Certificate Stores**), **CyberArk-SdkCredentialProvider** can be used as a PAM provider.
-
-When entering Secret fields, select the **Load From Keyfactor Secrets** tab, and populate the **Secret Value** field with the following JSON object:
-
-```json
-{"Safe":"The name of the Safe the credential resides in.","Folder":"The folder path the credential lives in. If it is nested, use the backwards slash e.g. Root\\Folder","Object":"The name of the password object that has the credential."}
-
-```
-
-> We recommend creating this JSON object in a text editor, and copying it into the Secret Value field.
-
-</details>
-
-
 > [!NOTE]
 > Additional information on CyberArk-SdkCredentialProvider can be found in the [supplemental documentation](docs/cyberark-sdkcredentialprovider.md).
+
+#### Extension Mechanics
+
+The `CyberArk-SdkCredentialProvider` PAM Provider Type uses an installed Credential Provider to communicate over a proprietary protocol to a CyberArk instance. The specifics of this communication, such as the port used, the Provider name, and the authenticated CyberArk user, are specified during the installation of the Credential Provider and are not managed by the Keyfactor PAM Provider plugin.
+Requests are sent using the specified Application ID through the Credential Provider. The Application Id, configured Provider name, and the user authenticated in the Credential Provider all need to have the correct permissions set to access Secrets directly in a CyberArk Vault.
+
+_About `Options`:_
+Additional options can be set in the `manifest.json` file in the `Options` section. The available options are already included in the sample `SDK-manifest.json`.
+- `UsingFrameworkSdk`: this option tells the SdkCredentialProvider to load the `NetPasswordSDK.dll` instead of the `NetStandardPasswordSDK.dll`.
+- `SdkPath`: if the SDK DLL is not in the same directory as the PAM Provider, this option can be used to specify the path to the SDK DLL. It should point to the directory where the SDK resides, and not directly to the DLL file.
+
+__Important__: When running the SDK Credential Provider on Keyfactor Command versions prior to version 11, the `NetPasswordSDK.dll` needs to be copied instead of `NetStandardPasswordSDK.dll`. This library is compatible with .NET Framework which is necessary to work in Keyfactor Command prior to version 11.
+If `NetPasswordSDK.dll` is used instead of the `NetStandardPasswordSDK.dll`, the `UsingFrameworkSdk` option should be set to `true`.
+
 </details>
+
+## Support
+
+The CyberArk PAM Provider is supported by Keyfactor for Keyfactor customers. If you have a support issue, please open a support ticket via the Keyfactor Support Portal at https://support.keyfactor.com.
+
+> To report a problem or suggest a new feature, use the **[Issues](../../issues)** tab. If you want to contribute actual bug fixes or proposed enhancements, use the **[Pull requests](../../pulls)** tab.
 
 ## License
 
